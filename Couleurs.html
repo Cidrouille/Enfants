@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Jeu des Couleurs</title>
-    <link rel="stylesheet" href="Couleurs.css">
+    <link rel="stylesheet" href="couleurs.css">
 </head>
 <body>
 
@@ -42,8 +42,9 @@
 <script>
 const colors = [
     {name:"Rouge", value:"#ff4d4d"},
+    {name:"Rose clair", value:"#ffb6c1"},
     {name:"Bleu", value:"#4dabf7"},
-	{name:"Bleu clair", value:"#3bc9db"},
+    {name:"Bleu clair", value:"#3bc9db"},
     {name:"Vert", value:"#69db7c"},
     {name:"Vert clair", value:"#b9fbc0"},
     {name:"Jaune", value:"#ffd43b"},
@@ -74,6 +75,8 @@ function newGame(){
     buttons.forEach(btn=>{
         btn.classList.remove("good","bad","click-anim");
         btn.disabled=false;
+        btn.style.background = "linear-gradient(45deg,#ffffff,#f1f3f5)";
+        btn.style.color = "black";
     });
 
     correctColor = colors[Math.floor(Math.random()*colors.length)];
@@ -89,26 +92,34 @@ function newGame(){
 
     buttons.forEach((btn,i)=>{
         btn.textContent = choices[i].name;
+        btn.dataset.color = choices[i].value; // stocke la couleur
         btn.onclick = ()=>checkAnswer(btn,choices[i]);
     });
 }
 
 function checkAnswer(btn,color){
     btn.classList.add("click-anim");
+    
+    // Appliquer la couleur du bouton selon la réponse
+    btn.style.background = color.value;
+    btn.style.color = "#fff";
+
     if(color===correctColor){
-        btn.classList.add("good");
         message.textContent="🎉 Bravo ! Bonne réponse !";
         nextBtn.style.display="inline-block";
 
         buttons.forEach(b=>{
-            if(b!==btn) b.classList.add("bad");
             b.disabled=true;
+            // si pas encore coloré, applique sa propre couleur
+            if(b!==btn) {
+                b.style.background = b.dataset.color;
+                b.style.color = "#fff";
+            }
         });
 
     } else {
-        btn.classList.add("bad");
-        btn.disabled=true;
         message.textContent="❌ Essaie encore !";
+        btn.disabled = true;
     }
 }
 
@@ -118,4 +129,3 @@ newGame();
 
 </body>
 </html>
-
