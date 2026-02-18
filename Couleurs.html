@@ -22,7 +22,11 @@
 </div>
 
 <header>
+	<div class="header-left">
+        <button id="goHomeBtn">Changer de jeu</button>
+    </div>
     <h1>🎨 Jeu des Couleurs</h1>
+    <p>Trouve la bonne couleur !</p>
 </header>
 
 <main>
@@ -41,9 +45,8 @@
 <script>
 const colors = [
     {name:"Rouge", value:"#ff4d4d"},
-    {name:"Rose clair", value:"#ffb6c1"},
     {name:"Bleu", value:"#4dabf7"},
-    {name:"Bleu clair", value:"#3bc9db"},
+	{name:"Bleu clair", value:"#3bc9db"},
     {name:"Vert", value:"#69db7c"},
     {name:"Vert clair", value:"#b9fbc0"},
     {name:"Jaune", value:"#ffd43b"},
@@ -60,6 +63,7 @@ const display = document.getElementById("colorDisplay");
 const buttons = document.querySelectorAll(".choice");
 const message = document.getElementById("message");
 const nextBtn = document.getElementById("nextBtn");
+const goHomeBtn = document.getElementById("goHomeBtn");
 
 let correctColor;
 
@@ -74,8 +78,6 @@ function newGame(){
     buttons.forEach(btn=>{
         btn.classList.remove("good","bad","click-anim");
         btn.disabled=false;
-        btn.style.background = "linear-gradient(45deg,#ffffff,#f1f3f5)";
-        btn.style.color = "black";
     });
 
     correctColor = colors[Math.floor(Math.random()*colors.length)];
@@ -91,40 +93,36 @@ function newGame(){
 
     buttons.forEach((btn,i)=>{
         btn.textContent = choices[i].name;
-        btn.dataset.color = choices[i].value; // stocke la couleur
         btn.onclick = ()=>checkAnswer(btn,choices[i]);
     });
 }
 
 function checkAnswer(btn,color){
     btn.classList.add("click-anim");
-
-    // couleur du bouton
-    btn.style.background = color.value;
-    btn.style.color = (color.value.toLowerCase() === "#ffffff") ? "black" : "#fff";
-
     if(color===correctColor){
+        btn.classList.add("good");
         message.textContent="🎉 Bravo ! Bonne réponse !";
         nextBtn.style.display="inline-block";
 
         buttons.forEach(b=>{
+            if(b!==btn) b.classList.add("bad");
             b.disabled=true;
-            if(b!==btn) {
-                b.style.background = b.dataset.color;
-                b.style.color = (b.dataset.color.toLowerCase() === "#ffffff") ? "black" : "#fff";
-            }
         });
 
     } else {
+        btn.classList.add("bad");
+        btn.disabled=true;
         message.textContent="❌ Essaie encore !";
-        btn.disabled = true;
     }
 }
 
 nextBtn.onclick=newGame;
 newGame();
+
+goHomeBtn.onclick = () => {
+    window.location.href = "Accueil.html";
+};
 </script>
 
 </body>
 </html>
-
