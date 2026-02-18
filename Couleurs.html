@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Jeu des Couleurs</title>
+    <link rel="stylesheet" href="couleurs.css">
+</head>
+<body>
+
+<!-- Fond animé : bulles et étoiles -->
+<div class="background">
+    <!-- Bulles -->
+    <span class="bubble" style="--size:30px; --left:10%; --duration:12s;"></span>
+    <span class="bubble" style="--size:50px; --left:70%; --duration:15s;"></span>
+    <span class="bubble" style="--size:40px; --left:40%; --duration:18s;"></span>
+    <span class="bubble" style="--size:25px; --left:80%; --duration:10s;"></span>
+
+    <!-- Etoiles -->
+    <span class="star" style="--size:12px; --left:15%; --duration:8s;"></span>
+    <span class="star" style="--size:10px; --left:45%; --duration:10s;"></span>
+    <span class="star" style="--size:14px; --left:70%; --duration:12s;"></span>
+</div>
+
+<header>
+    <h1>🎨 Jeu des Couleurs</h1>
+    <p>Trouve la bonne couleur !</p>
+</header>
+
+<main>
+    <div id="colorDisplay"></div>
+
+    <div class="choices">
+        <button class="choice"></button>
+        <button class="choice"></button>
+        <button class="choice"></button>
+    </div>
+
+    <p id="message"></p>
+    <button id="nextBtn">Couleur suivante →</button>
+</main>
+
+<script>
+const colors = [
+    {name:"Rouge", value:"#ff4d4d"},
+    {name:"Bleu", value:"#4dabf7"},
+	{name:"Bleu clair", value:"#3bc9db"},
+    {name:"Vert", value:"#69db7c"},
+    {name:"Vert clair", value:"#b9fbc0"},
+    {name:"Jaune", value:"#ffd43b"},
+    {name:"Orange", value:"#ffa94d"},
+    {name:"Violet", value:"#b197fc"},
+    {name:"Marron", value:"#8d6e63"},
+    {name:"Gris", value:"#adb5bd"},
+    {name:"Gris clair", value:"#e0e0e0"},
+    {name:"Noir", value:"#343a40"},
+    {name:"Blanc", value:"#ffffff"}
+];
+
+const display = document.getElementById("colorDisplay");
+const buttons = document.querySelectorAll(".choice");
+const message = document.getElementById("message");
+const nextBtn = document.getElementById("nextBtn");
+
+let correctColor;
+
+function shuffle(array){
+    return array.sort(() => Math.random()-0.5);
+}
+
+function newGame(){
+    message.textContent = "";
+    nextBtn.style.display = "none";
+
+    buttons.forEach(btn=>{
+        btn.classList.remove("good","bad","click-anim");
+        btn.disabled=false;
+    });
+
+    correctColor = colors[Math.floor(Math.random()*colors.length)];
+    display.style.background = correctColor.value;
+
+    let choices = [correctColor];
+    while(choices.length<3){
+        let c = colors[Math.floor(Math.random()*colors.length)];
+        if(!choices.includes(c)) choices.push(c);
+    }
+
+    choices = shuffle(choices);
+
+    buttons.forEach((btn,i)=>{
+        btn.textContent = choices[i].name;
+        btn.onclick = ()=>checkAnswer(btn,choices[i]);
+    });
+}
+
+function checkAnswer(btn,color){
+    btn.classList.add("click-anim");
+    if(color===correctColor){
+        btn.classList.add("good");
+        message.textContent="🎉 Bravo ! Bonne réponse !";
+        nextBtn.style.display="inline-block";
+
+        buttons.forEach(b=>{
+            if(b!==btn) b.classList.add("bad");
+            b.disabled=true;
+        });
+
+    } else {
+        btn.classList.add("bad");
+        btn.disabled=true;
+        message.textContent="❌ Essaie encore !";
+    }
+}
+
+nextBtn.onclick=newGame;
+newGame();
+</script>
+
+</body>
+</html>
