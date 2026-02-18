@@ -17,6 +17,7 @@ header {
   border-bottom-left-radius: 40px;
   border-bottom-right-radius: 40px;
   color:white;
+  
 }
 header h1 {
   font-size: 2em;
@@ -26,6 +27,38 @@ header h1 {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   animation: rainbow 5s linear infinite;
+}
+
+.header-left {
+  position: absolute;
+  top: 40px;
+  left: 200px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 220px;  /* largeur fixe du conteneur */
+}
+
+.header-left button {
+  padding: 12px 30px;
+  min-width: 160px;      /* force une largeur identique */
+  border: none;
+  border-radius: 30px;
+  font-size: 18px;        /* taille uniforme */
+  font-weight: bold;
+  background: linear-gradient(45deg,#70e1f5,#a1f7ff);
+  color: black;
+  cursor: pointer;
+  transition: transform 0.3s;
+  text-align: center;     /* assure que le texte reste centré */
+}
+
+.header-left button:hover { transform: scale(1.1); }
+
+header h1 {
+  font-size: 2em;
+  font-weight: bold;
+  margin: 0;
 }
 
 @keyframes rainbow {
@@ -42,13 +75,12 @@ main {
   justify-content: center; 
   align-items: center;
   position: relative;
-  z-index: 2;
 }
 
 /* Carré de couleur */
 #colorDisplay {
-  width: 300px;
-  height: 300px;
+  width: 250px;
+  height: 250px;
   margin: 20px 0;
   border-radius: 40px;
   box-shadow: 0 12px 25px rgba(0,0,0,0.3);
@@ -64,7 +96,6 @@ main {
   justify-content: center;
   gap: 25px;
   margin-bottom: 20px;
-  z-index: 2;
 }
 
 .choice {
@@ -123,7 +154,6 @@ main {
   height: 100%;
   top:0;
   left:0;
-  z-index:1;
 }
 
 .bubble {
@@ -159,4 +189,3 @@ main {
   50%{opacity:1;transform:scale(1.5);}
   100%{opacity:0.4;transform:scale(1);}
 }
-
