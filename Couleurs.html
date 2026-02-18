@@ -99,10 +99,10 @@ function newGame(){
 
 function checkAnswer(btn,color){
     btn.classList.add("click-anim");
-    
-    // Appliquer la couleur du bouton selon la réponse
+
+    // couleur du bouton
     btn.style.background = color.value;
-    btn.style.color = "#fff";
+    btn.style.color = (color.value.toLowerCase() === "#ffffff") ? "black" : "#fff";
 
     if(color===correctColor){
         message.textContent="🎉 Bravo ! Bonne réponse !";
@@ -110,10 +110,9 @@ function checkAnswer(btn,color){
 
         buttons.forEach(b=>{
             b.disabled=true;
-            // si pas encore coloré, applique sa propre couleur
             if(b!==btn) {
                 b.style.background = b.dataset.color;
-                b.style.color = "#fff";
+                b.style.color = (b.dataset.color.toLowerCase() === "#ffffff") ? "black" : "#fff";
             }
         });
 
@@ -129,4 +128,3 @@ newGame();
 
 </body>
 </html>
-
