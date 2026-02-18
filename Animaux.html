@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Jeu des Animaux</title>
+    <link rel="stylesheet" href="Animaux.css">
+</head>
+<body>
+
+<div class="background">
+    <!-- Bulles -->
+    <span class="bubble" style="--size:30px; --left:10%; --duration:12s;"></span>
+    <span class="bubble" style="--size:50px; --left:70%; --duration:15s;"></span>
+    <span class="bubble" style="--size:40px; --left:40%; --duration:18s;"></span>
+    <span class="bubble" style="--size:25px; --left:80%; --duration:10s;"></span>
+
+    <!-- Etoiles -->
+    <span class="star" style="--size:12px; --left:15%; --duration:8s;"></span>
+    <span class="star" style="--size:10px; --left:45%; --duration:10s;"></span>
+    <span class="star" style="--size:14px; --left:70%; --duration:12s;"></span>
+</div>
+
+<header>
+    <div class="header-left">
+        <button id="goHomeBtn">Changer de jeu</button>
+        <button id="changeThemeBtn" style="display:none;">Changer de thème</button>
+    </div>
+    <h1><img src="images/Titre.png" alt="Jeu des Animaux" id="titleImg"></h1>
+</header>
+
+<main>
+    <!-- Menu des thèmes -->
+    <div id="themeMenu">
+        <div class="theme-card" data-theme="savanne">
+            <span>🌵</span><p>Savanne</p>
+        </div>
+        <div class="theme-card" data-theme="jungle">
+            <span>🌴</span><p>Jungle</p>
+        </div>
+        <div class="theme-card" data-theme="basse-cour">
+            <span>🏡</span><p>Basse-cour</p>
+        </div>
+        <div class="theme-card" data-theme="glace">
+            <span>❄️</span><p>Glace</p>
+        </div>
+		<div class="theme-card" data-theme="ocean">
+            <span>🌊</span><p>Océan</p>
+        </div>
+    </div>
+
+    <!-- Zone de jeu -->
+    <div id="gameArea" style="display:none;">
+        <div id="animalDisplay">
+            <img id="animalImg" src="" alt="animal" />
+        </div>
+
+        <div class="choices">
+            <button class="choice"></button>
+            <button class="choice"></button>
+            <button class="choice"></button>
+        </div>
+
+        <p id="message"></p>
+        <button id="nextBtn">Animal suivant →</button>
+    </div>
+</main>
+
+<script>
+/* ===== DONNEES ===== */
+const animaux = [
+    {name: "Lion", img: "images/Savanne/lion.png", theme: "savanne"},
+	{name: "Eléphant", img: "images/Savanne/elephant.png", theme: "savanne"},
+	{name: "Hippopotame", img: "images/Savanne/hippopotame.png", theme: "savanne"},
+	{name: "Rhinocéros", img: "images/Savanne/rhinoceros.png", theme: "savanne"},
+	{name: "Dromadaire", img: "images/Savanne/dromadaire.png", theme: "savanne"},
+	{name: "Lionne", img: "images/Savanne/lionne.png", theme: "savanne"},
+	{name: "Zèbre", img: "images/Savanne/zebre.png", theme: "savanne"},
+	{name: "Antilope", img: "images/Savanne/antilope.png", theme: "savanne"},
+	{name: "Girafe", img: "images/Savanne/Savanne/girafe.png", theme: "savanne"},
+	{name: "Crocodile", img: "images/Savanne/crocodile.png", theme: "savanne"},
+	{name: "Aigle", img: "images/Savanne/aigle.png", theme: "savanne"},
+	{name: "Serpent", img: "images/Jungle/serpent.png", theme: "jungle"},
+	{name: "Koala", img: "images/Jungle/koala.png", theme: "jungle"},
+	{name: "Grenouille", img: "images/Jungle/grenouille.png", theme: "jungle"},
+	{name: "Ecureuil", img: "images/Jungle/ecureuil.png", theme: "jungle"},
+	{name: "Caméléon", img: "images/Jungle/cameleon.png", theme: "jungle"},
+	{name: "Tortue", img: "images/Jungle/tortue.png", theme: "jungle"},
+	{name: "Tigre", img: "images/Jungle/tigre.png", theme: "jungle"},
+	{name: "Ours brun", img: "images/Jungle/ours brun.png", theme: "jungle"},
+	{name: "Panda", img: "images/Jungle/panda.png", theme: "jungle"},
+	{name: "Perroquet", img: "images/Jungle/perroquet.png", theme: "jungle"},
+	{name: "Toucan", img: "images/Jungle/toucan.png", theme: "jungle"}
+
+];
+
+/* Fond par thème */
+const themeBackgrounds = {
+    "savanne": "url('images/Savanne/Savanne.png') no-repeat center center / cover",
+    "jungle": "url('images/Jungle/Jungle.png') no-repeat center center / cover",
+    "basse-cour": "linear-gradient(135deg,#ffe47a,#ffd66b)",
+    "glace": "linear-gradient(135deg,#a1c4fd,#c2e9fb)",
+	"ocean": "linear-gradient(135deg,#a1c4fd,#c2e9fb)"
+};
+
+/* ===== ELEMENTS ===== */
+const themeCards = document.querySelectorAll(".theme-card");
+const themeMenu = document.getElementById("themeMenu");
+const gameArea = document.getElementById("gameArea");
+const animalImg = document.getElementById("animalImg");
+const buttons = document.querySelectorAll(".choice");
+const message = document.getElementById("message");
+const nextBtn = document.getElementById("nextBtn");
+const goHomeBtn = document.getElementById("goHomeBtn");
+const changeThemeBtn = document.getElementById("changeThemeBtn");
+
+let currentAnimals = [];
+let correctAnimal;
+
+function shuffle(array){ return array.sort(() => Math.random()-0.5); }
+
+/* ===== CLICK SUR THEME ===== */
+themeCards.forEach(card => {
+    card.onclick = () => {
+        const theme = card.dataset.theme;
+        currentAnimals = animaux.filter(a => a.theme === theme);
+        if(currentAnimals.length === 0){
+            alert("Aucun animal pour ce thème !");
+            return;
+        }
+
+        // Appliquer le fond du thème
+        document.body.style.background = themeBackgrounds[theme];
+
+        themeMenu.style.display = "none";
+        gameArea.style.display = "flex";
+
+        // Afficher le bouton changer de thème
+        changeThemeBtn.style.display = "inline-block";
+
+        startGame();
+    }
+});
+
+/* ===== DEMARRER UNE PARTIE ===== */
+function startGame(){
+    message.textContent = "";
+    nextBtn.style.display = "none";
+
+    buttons.forEach(btn=>{
+        btn.classList.remove("good","bad","click-anim");
+        btn.disabled=false;
+        btn.style.background = "linear-gradient(45deg,#ffffff,#f1f3f5)";
+        btn.style.color = "black";
+    });
+
+    // Animal correct aléatoire dans le thème
+    correctAnimal = currentAnimals[Math.floor(Math.random() * currentAnimals.length)];
+    animalImg.src = correctAnimal.img;
+
+    // Créer liste de réponses
+    let choices = [correctAnimal];
+
+    // Mélanger les animaux du thème
+    let shuffled = [...currentAnimals].sort(() => Math.random() - 0.5);
+
+    // Ajouter 2 faux animaux différents
+    shuffled.forEach(a => {
+        if(choices.length < 3 && a !== correctAnimal){
+            choices.push(a);
+        }
+    });
+
+    // Mélanger les réponses finales
+    choices = shuffle(choices);
+
+    buttons.forEach((btn,i)=>{
+        btn.textContent = choices[i].name;
+        btn.onclick = ()=>checkAnswer(btn, choices[i]);
+    });
+}
+
+
+/* ===== CHECK REPONSE ===== */
+function checkAnswer(btn, animal){
+    btn.classList.add("click-anim");
+    if(animal === correctAnimal){
+        btn.style.background = "#69db7c";
+        btn.style.color = "#fff";
+        message.textContent = "🎉 Bravo ! Bonne réponse !";
+        nextBtn.style.display = "inline-block";
+
+        buttons.forEach(b=>{
+            if(b !== btn) {
+                b.style.background = "#ff6b6b";
+                b.style.color = "#fff";
+                b.disabled = true;
+            } else b.disabled = true;
+        });
+    } else {
+        btn.style.background = "#ff6b6b";
+        btn.style.color = "#fff";
+        btn.disabled = true;
+        message.textContent = "❌ Essaie encore !";
+    }
+}
+
+/* ===== BOUTONS ===== */
+nextBtn.onclick = startGame;
+
+changeThemeBtn.onclick = () => {
+    gameArea.style.display = "none";
+    themeMenu.style.display = "flex";
+    changeThemeBtn.style.display = "none";
+
+    // Remettre le fond initial
+    document.body.style.background = "linear-gradient(135deg,#f6d365,#fda085)";
+};
+
+goHomeBtn.onclick = () => {
+    window.location.href = "Accueil.html";
+};
+</script>
+</body>
+</html>
