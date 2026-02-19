@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Sudoku</title>
+<link rel="stylesheet" href="Sudoku.css">
+</head>
+<body>
+
+<div class="background">
+    <span class="bubble" style="--size:30px; --left:10%; --duration:12s;"></span>
+    <span class="bubble" style="--size:50px; --left:70%; --duration:15s;"></span>
+    <span class="bubble" style="--size:40px; --left:40%; --duration:18s;"></span>
+
+    <span class="star" style="--size:12px; --left:15%; --duration:8s;"></span>
+    <span class="star" style="--size:10px; --left:45%; --duration:10s;"></span>
+</div>
+
+<header>
+    <div class="header-left">
+        <button onclick="window.location.href='Accueil.html'">Changer de jeu</button>
+    </div>
+    <h1>🧩 Sudoku</h1>
+</header>
+
+<main>
+    <div id="sudoku" class="sudoku-container"></div>
+
+    <div class="controls">
+        <button onclick="checkSudoku()">Vérifier</button>
+        <button onclick="generateNewGame()">Nouvelle grille</button>
+    </div>
+
+    <p id="message"></p>
+</main>
+
+<script>
+const container = document.getElementById("sudoku");
+let solution = [];
+let puzzle = [];
+
+/* ==================== */
+/* GENERATION SUDOKU */
+/* ==================== */
+
+function shuffle(array){
+    return array.sort(()=>Math.random()-0.5);
+}
+
+function isValid(grid,row,col,num){
+    for(let x=0;x<9;x++){
+        if(grid[row][x]==num || grid[x][col]==num) return false;
+    }
+    let startRow=row-row%3;
+    let startCol=col-col%3;
+    for(let i=0;i<3;i++){
+        for(let j=0;j<3;j++){
+            if(grid[i+startRow][j+startCol]==num) return false;
+        }
+    }
+    return true;
+}
+
+function solve(grid){
+    for(let row=0;row<9;row++){
+        for(let col=0;col<9;col++){
+            if(grid[row][col]==0){
+                let numbers=shuffle([1,2,3,4,5,6,7,8,9]);
+                for(let num of numbers){
+                    if(isValid(grid,row,col,num)){
+                        grid[row][col]=num;
+                        if(solve(grid)) return true;
+                        grid[row][col]=0;
+                    }
+                }
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+function generateSudoku(){
+    let grid=Array.from({length:9},()=>Array(9).fill(0));
+    solve(grid);
+    solution=grid.map(r=>[...r]);
+
+    puzzle=grid.map(r=>[...r]);
+
+    // retirer 40 cases
+    let attempts=40;
+    while(attempts>0){
+        let row=Math.floor(Math.random()*9);
+        let col=Math.floor(Math.random()*9);
+        if(puzzle[row][col]!=0){
+            puzzle[row][col]=0;
+            attempts--;
+        }
+    }
+}
+
+/* ==================== */
+/* AFFICHAGE */
+/* ==================== */
+
+function drawGrid(){
+    container.innerHTML="";
+    for(let r=0;r<9;r++){
+        for(let c=0;c<9;c++){
+            const input=document.createElement("input");
+            input.type="number";
+            input.min=1;
+            input.max=9;
+            input.classList.add("cell");
+
+            if(puzzle[r][c]!=0){
+                input.value=puzzle[r][c];
+                input.disabled=true;
+                input.classList.add("fixed");
+            }
+
+            input.dataset.row=r;
+            input.dataset.col=c;
+
+            container.appendChild(input);
+        }
+    }
+}
+
+/* ==================== */
+/* CHECK */
+/* ==================== */
+
+function checkSudoku(){
+    let correct=true;
+    document.querySelectorAll(".cell").forEach(cell=>{
+        let r=cell.dataset.row;
+        let c=cell.dataset.col;
+
+        if(!cell.disabled){
+            if(parseInt(cell.value)==solution[r][c]){
+                cell.style.background="#69db7c";
+            } else {
+                cell.style.background="#ff6b6b";
+                correct=false;
+            }
+        }
+    });
+
+    document.getElementById("message").textContent=
+        correct ? "🎉 Bravo ! Sudoku correct !" : "❌ Il y a des erreurs.";
+}
+
+function generateNewGame(){
+    generateSudoku();
+    drawGrid();
+    document.getElementById("message").textContent="";
+}
+
+/* INIT */
+generateNewGame();
+</script>
+
+</body>
+</html>

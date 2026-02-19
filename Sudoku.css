@@ -1,0 +1,161 @@
+/* ========================= */
+/* BASE */
+/* ========================= */
+
+body{
+    margin:0;
+    font-family:Arial, sans-serif;
+    background: linear-gradient(135deg,#f6d365,#fda085);
+    min-height:100vh;
+    overflow:hidden;
+}
+
+/* ========================= */
+/* HEADER */
+/* ========================= */
+
+header{
+    text-align:center;
+    padding:20px;
+    position:relative;
+}
+
+.header-left{
+    position:absolute;
+    top:20px;
+    left:20px;
+}
+
+button{
+    padding:10px 15px;
+    border:none;
+    border-radius:8px;
+    cursor:pointer;
+    background:linear-gradient(45deg,#ffffff,#f1f3f5);
+    font-weight:bold;
+    transition:0.2s;
+}
+
+button:hover{
+    transform:scale(1.05);
+}
+
+/* ========================= */
+/* SUDOKU GRID */
+/* ========================= */
+
+.sudoku-container{
+    display:grid;
+    grid-template-columns: repeat(9, 55px);
+    grid-template-rows: repeat(9, 55px);
+    margin:30px auto;
+    width:fit-content;      /* 🔥 IMPORTANT */
+    border:3px solid black; /* contour uniquement autour de la grille */
+    box-shadow:0 8px 20px rgba(0,0,0,0.2);
+}
+
+/* Cases */
+.cell{
+    width:55px;
+    height:55px;
+    text-align:center;
+    font-size:20px;
+    border:1px solid #555;
+    outline:none;
+    box-sizing:border-box;
+    transition:0.2s;
+}
+
+.cell:focus{
+    background:#ffe066;
+}
+
+.fixed{
+    background:#dee2e6;
+    font-weight:bold;
+}
+
+/* ========================= */
+/* BLOCS 3x3 */
+/* ========================= */
+
+/* Bordures verticales épaisses */
+.cell:nth-child(3n){
+    border-right:3px solid black;
+}
+
+.cell:nth-child(9n+1){
+    border-left:3px solid black;
+}
+
+/* Lignes après 3 et 6 */
+.cell:nth-child(n+19):nth-child(-n+27),
+.cell:nth-child(n+46):nth-child(-n+54){
+    border-bottom:3px solid black;
+}
+
+/* ========================= */
+/* CONTROLS */
+/* ========================= */
+
+.controls{
+    text-align:center;
+    margin-top:25px;
+}
+
+#message{
+    text-align:center;
+    font-size:18px;
+    margin-top:15px;
+    font-weight:bold;
+}
+
+/* ========================= */
+/* BACKGROUND ANIMATION */
+/* ========================= */
+
+.background{
+    position:fixed;
+    width:100%;
+    height:100%;
+    overflow:hidden;
+    z-index:-1;
+}
+
+.bubble, .star{
+    position:absolute;
+    bottom:-100px;
+    left:var(--left);
+    width:var(--size);
+    height:var(--size);
+    animation:float var(--duration) linear infinite;
+}
+
+/* Bulles */
+.bubble{
+    background:rgba(255,255,255,0.3);
+    border-radius:50%;
+}
+
+/* Etoiles */
+.star{
+    background:yellow;
+    clip-path:polygon(
+        50% 0%,
+        61% 35%,
+        98% 35%,
+        68% 57%,
+        79% 91%,
+        50% 70%,
+        21% 91%,
+        32% 57%,
+        2% 35%,
+        39% 35%
+    );
+}
+
+/* Animation */
+@keyframes float{
+    from{transform:translateY(0);}
+    to{transform:translateY(-120vh);}
+}
