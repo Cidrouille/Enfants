@@ -66,7 +66,7 @@ header {
 .jeux { background: #9bf6ff; }
 .couleurs { background: #ffc6ff; }
 .bonus { background: #bdb2ff; }
-.sudoku { background: #f2ad4e; }
+.sudoku { background: #f5af5b; }
 
 /* FOOTER */
 
@@ -77,4 +77,5 @@ footer {
   border-top-left-radius: 40px;
   border-top-right-radius: 40px;
 }
+
 
