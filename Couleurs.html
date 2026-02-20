@@ -7,7 +7,7 @@
 </head>
 <body>
 
-<!-- Fond animé : bulles et étoiles -->
+<!-- Fond animé -->
 <div class="background">
     <!-- Bulles -->
     <span class="bubble" style="--size:30px; --left:10%; --duration:12s;"></span>
@@ -15,10 +15,36 @@
     <span class="bubble" style="--size:40px; --left:40%; --duration:18s;"></span>
     <span class="bubble" style="--size:25px; --left:80%; --duration:10s;"></span>
 
-    <!-- Etoiles -->
-    <span class="star" style="--size:12px; --left:15%; --duration:8s;"></span>
-    <span class="star" style="--size:10px; --left:45%; --duration:10s;"></span>
-    <span class="star" style="--size:14px; --left:70%; --duration:12s;"></span>
+    <!-- Lumières -->
+    <span class="lights" style="--size:12px; --left:15%; --duration:8s;"></span>
+    <span class="lights" style="--size:10px; --left:45%; --duration:10s;"></span>
+    <span class="lights" style="--size:14px; --left:70%; --duration:12s;"></span>
+	
+	<!-- Etoiles -->
+	<span class="star" style="--size:18px; --left:15%; --duration:12s;"></span>
+    <span class="star" style="--size:12px; --left:45%; --duration:8s;"></span>
+	<span class="star" style="--size:25px; --left:85%; --duration:10s;"></span>
+	
+	<!-- Lunes -->
+	<span class="lune" style="--size:18px; --left:20%; --duration:10s;"></span>
+    <span class="lune" style="--size:12px; --left:50%; --duration:15s;"></span>
+	<span class="lune" style="--size:25px; --left:90%; --duration:13s;"></span>
+	
+	<div class="shooting-star" style="--size:25px; --duration:5s; --start-left:0vw; --start-bottom:65%;">
+	  <div class="trail"></div>
+	  <div class="star-shape"></div>
+	</div>
+	<div class="shooting-star" style="--size:25px; --duration:6s; --start-left:0vw; --start-bottom:10%;">
+	  <div class="trail"></div>
+	  <div class="star-shape"></div>
+	</div>
+	<div class="shooting-star" style="--size:25px; --duration:7s; --start-left:50vw; --start-bottom:0%;">
+	  <div class="trail"></div>
+	  <div class="star-shape"></div>
+	</div>
+	
+	<div id="cursor-trail"></div>
+	
 </div>
 
 <header>
@@ -27,6 +53,8 @@
     </div>
     <h1>🎨 Jeu des Couleurs</h1>
     <p>Trouve la bonne couleur !</p>
+	
+	<div id="cursor-trail"></div>
 </header>
 
 <main>
@@ -122,6 +150,78 @@ newGame();
 goHomeBtn.onclick = () => {
     window.location.href = "Accueil.html";
 };
+
+// TRAÎNÉE ARC-EN-CIEL FLUIDE LÉGÈRE
+const trailCanvas = document.createElement("canvas");
+trailCanvas.style.position = "fixed";
+trailCanvas.style.top = "0";
+trailCanvas.style.left = "0";
+trailCanvas.style.pointerEvents = "none";
+trailCanvas.style.zIndex = "9999";
+document.body.appendChild(trailCanvas);
+
+const ctx = trailCanvas.getContext("2d");
+let width = window.innerWidth;
+let height = window.innerHeight;
+trailCanvas.width = width;
+trailCanvas.height = height;
+
+window.addEventListener("resize", () => {
+    width = window.innerWidth;
+    height = window.innerHeight;
+    trailCanvas.width = width;
+    trailCanvas.height = height;
+});
+
+let mouseX = width/2;
+let mouseY = height/2;
+let lastMove = Date.now();
+
+document.addEventListener("mousemove", e => {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+    lastMove = Date.now();
+});
+
+const trail = [];
+const maxTrail = 10; // moins de points => traînée plus courte
+
+function animateTrailCanvas() {
+    ctx.clearRect(0,0,width,height);
+
+    // ajoute la nouvelle position
+    trail.push({x: mouseX, y: mouseY, time: Date.now()});
+    if(trail.length > maxTrail) trail.shift();
+
+    for(let i=0; i<trail.length-1; i++){
+        const p = trail[i];
+        const next = trail[i+1];
+        const alpha = 0.8 * (1 - i / trail.length); // plus subtil
+
+        const hue = (i*30 + Date.now()/10)%360;
+        ctx.strokeStyle = `hsla(${hue},100%,60%,${alpha})`;
+        ctx.lineWidth = 6*(alpha); 
+
+        // effet de flou léger
+        ctx.shadowBlur = 8;
+        ctx.shadowColor = ctx.strokeStyle;
+
+        ctx.beginPath();
+        ctx.moveTo(p.x, p.y);
+        ctx.lineTo(next.x, next.y);
+        ctx.stroke();
+    }
+
+    // efface si souris immobile > 300ms
+    if(Date.now() - lastMove > 300){
+        trail.length = 0;
+    }
+
+    requestAnimationFrame(animateTrailCanvas);
+}
+
+animateTrailCanvas();
+
 </script>
 
 </body>
