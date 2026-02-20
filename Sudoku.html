@@ -8,20 +8,56 @@
 <body>
 
 <div class="background">
+    <!-- Bulles -->
     <span class="bubble" style="--size:30px; --left:10%; --duration:12s;"></span>
     <span class="bubble" style="--size:50px; --left:70%; --duration:15s;"></span>
     <span class="bubble" style="--size:40px; --left:40%; --duration:18s;"></span>
+    <span class="bubble" style="--size:25px; --left:80%; --duration:10s;"></span>
 
-    <span class="star" style="--size:12px; --left:15%; --duration:8s;"></span>
-    <span class="star" style="--size:10px; --left:45%; --duration:10s;"></span>
+    <!-- Lumières -->
+    <span class="lights" style="--size:12px; --left:15%; --duration:8s;"></span>
+    <span class="lights" style="--size:10px; --left:45%; --duration:10s;"></span>
+    <span class="lights" style="--size:14px; --left:70%; --duration:12s;"></span>
+	
+	<!-- Etoiles -->
+	<span class="star" style="--size:18px; --left:15%; --duration:12s;"></span>
+    <span class="star" style="--size:12px; --left:45%; --duration:8s;"></span>
+	<span class="star" style="--size:25px; --left:85%; --duration:10s;"></span>
+	
+	<!-- Lunes -->
+	<span class="lune" style="--size:18px; --left:20%; --duration:10s;"></span>
+    <span class="lune" style="--size:12px; --left:50%; --duration:15s;"></span>
+	<span class="lune" style="--size:25px; --left:90%; --duration:13s;"></span>
+	
+	<div class="shooting-star" style="--size:25px; --duration:5s; --start-left:0vw; --start-bottom:65%;">
+	  <div class="trail"></div>
+	  <div class="star-shape"></div>
+	</div>
+	<div class="shooting-star" style="--size:25px; --duration:6s; --start-left:0vw; --start-bottom:10%;">
+	  <div class="trail"></div>
+	  <div class="star-shape"></div>
+	</div>
+	<div class="shooting-star" style="--size:25px; --duration:7s; --start-left:50vw; --start-bottom:0%;">
+	  <div class="trail"></div>
+	  <div class="star-shape"></div>
+	</div>
+	
+	<div id="cursor-trail"></div>
 </div>
 
 <header>
     <div class="header-left">
-        <button onclick="window.location.href='Accueil.html'">Changer de jeu</button>
+        <button id="goHomeBtn">Changer de jeu</button>
     </div>
     <h1>🧩 Sudoku</h1>
 </header>
+
+<!-- Boutons de difficulté -->
+<div class="difficulty">
+    <button class="diff-btn" data-diff="facile">Facile</button>
+    <button class="diff-btn" data-diff="moyen">Moyen</button>
+    <button class="diff-btn" data-diff="difficile">Difficile</button>
+</div>
 
 <main>
     <div id="sudoku" class="sudoku-container"></div>
@@ -39,10 +75,19 @@ const container = document.getElementById("sudoku");
 let solution = [];
 let puzzle = [];
 
-/* ==================== */
-/* GENERATION SUDOKU */
-/* ==================== */
+// Difficulté par défaut
+let currentDifficulty = "facile";
 
+// Mapping nombre de cases à retirer
+const difficultyMap = {
+    "facile": 30,
+    "moyen": 40,
+    "difficile": 50
+};
+
+/* ==================== */
+/* FONCTIONS SUDOKU */
+/* ==================== */
 function shuffle(array){
     return array.sort(()=>Math.random()-0.5);
 }
@@ -80,29 +125,27 @@ function solve(grid){
     return true;
 }
 
+// Génération d'une grille selon la difficulté
 function generateSudoku(){
     let grid=Array.from({length:9},()=>Array(9).fill(0));
     solve(grid);
-    solution=grid.map(r=>[...r]);
+    solution = grid.map(r=>[...r]);
+    puzzle = grid.map(r=>[...r]);
 
-    puzzle=grid.map(r=>[...r]);
-
-    // retirer 40 cases
-    let attempts=40;
+    let attempts = difficultyMap[currentDifficulty];
     while(attempts>0){
-        let row=Math.floor(Math.random()*9);
-        let col=Math.floor(Math.random()*9);
-        if(puzzle[row][col]!=0){
-            puzzle[row][col]=0;
+        let row = Math.floor(Math.random()*9);
+        let col = Math.floor(Math.random()*9);
+        if(puzzle[row][col] != 0){
+            puzzle[row][col] = 0;
             attempts--;
         }
     }
 }
 
 /* ==================== */
-/* AFFICHAGE */
+/* AFFICHAGE GRILLE */
 /* ==================== */
-
 function drawGrid(){
     container.innerHTML="";
     for(let r=0;r<9;r++){
@@ -128,9 +171,8 @@ function drawGrid(){
 }
 
 /* ==================== */
-/* CHECK */
+/* CHECK SUDOKU */
 /* ==================== */
-
 function checkSudoku(){
     let correct=true;
     document.querySelectorAll(".cell").forEach(cell=>{
@@ -151,14 +193,33 @@ function checkSudoku(){
         correct ? "🎉 Bravo ! Sudoku correct !" : "❌ Il y a des erreurs.";
 }
 
+/* ==================== */
+/* NOUVELLE GRILLE */
+// Utilise currentDifficulty
 function generateNewGame(){
     generateSudoku();
     drawGrid();
-    document.getElementById("message").textContent="";
+    document.getElementById("message").textContent = 
+        `Difficulté actuelle : ${currentDifficulty.toUpperCase()}`;
 }
 
+/* ==================== */
+/* BOUTONS DIFFICULTÉ */
+document.querySelectorAll(".diff-btn").forEach(btn=>{
+    btn.addEventListener("click", ()=>{
+        currentDifficulty = btn.dataset.diff;
+        generateNewGame();
+    });
+});
+
+/* ==================== */
 /* INIT */
 generateNewGame();
+
+goHomeBtn.onclick = () => {
+    window.location.href = "Accueil.html";
+};
+
 </script>
 
 </body>
