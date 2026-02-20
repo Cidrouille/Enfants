@@ -1,7 +1,7 @@
 body {
   margin: 0;
   font-family: "Comic Sans MS","Trebuchet MS",sans-serif;
-  background: linear-gradient(135deg,#f6d365,#fda085);
+  background: linear-gradient(135deg,#caffbf, #9bf6a0, #52b788);
   overflow-x: hidden;
   display: flex;
   flex-direction: column;
