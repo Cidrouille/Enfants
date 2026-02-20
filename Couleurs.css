@@ -37,10 +37,6 @@ a:hover, button:hover {
     z-index: 9999;
 }
 
-canvas {
-    pointer-events: none; /* le canvas ne bloque pas les clics */
-}
-
 /* HEADER */
 header {
   background: linear-gradient(45deg,#ff9aa2,#ffdac1);
@@ -341,4 +337,5 @@ main {
   box-shadow: 0 0 15px #ffd700, 0 0 30px #ffff66;
   z-index: 10;
 }
+
 
