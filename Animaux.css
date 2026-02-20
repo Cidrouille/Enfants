@@ -10,6 +10,33 @@ body {
   position: relative;
 }
 
+/* Curseur par défaut sur tout le corps */
+body, a, button {
+    cursor: url('images/curseur.png'), auto; /* centre du curseur */
+}
+
+/* Facultatif : si tu veux que le curseur reste la main même sur hover ou éléments spéciaux */
+a:hover, button:hover {
+    cursor: url('images/curseur2.png'), auto;
+}
+
+#goHomeBtn:hover, .theme-card:hover {
+    cursor: url('images/curseur2.png'), auto;
+}
+
+/* PARTICULES DE LA TRAÎNÉE */
+.cursor-trail {
+    position: fixed;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: conic-gradient(red, orange, yellow, green, blue, indigo, violet);
+    pointer-events: none;
+    filter: blur(3px);
+    transition: transform 0.1s;
+    z-index: 9999;
+}
+
 /* ===== HEADER ===== */
 header {
   background: linear-gradient(45deg,#ff9a76,#ffdac1);
@@ -20,7 +47,6 @@ header {
   display: flex;
   flex-direction: column;
   align-items: center;
-  position: relative;
 }
 
 .header-left {
@@ -55,7 +81,13 @@ header h1 {
   margin: 0;
 }
 
-#titleImg { max-width: 25%; height: auto; }
+#titleImg {
+  max-width: 25%;
+  height: auto;
+  display: block;               /* pour éviter les décalages liés à inline */
+  margin: 0 auto;               /* centre l'image horizontalement */
+  transform: translateY(-15px); /* monte l'image de 10px */
+ }
 
 main {
   flex: 1;
@@ -88,6 +120,9 @@ main {
   font-weight: bold;
   box-shadow: 0 6px 15px rgba(0,0,0,0.2);
   transition: transform 0.3s, box-shadow 0.3s;
+  position: relative;
+  z-index: 2;
+  
 }
 .theme-card span { font-size: 3em; }
 .theme-card:hover { transform: scale(1.1); box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
@@ -153,23 +188,43 @@ main {
   height: 100%;
   top:0;
   left:0;      
-  z-index: 9999;
-  pointer-events: none;
+  z-index: 0;            /* fond derrière tout le contenu */
+  pointer-events: none;  /* clics passent à travers */
 }
 
-.bubble {
-  position: absolute;
-  bottom:-50px;
-  width: var(--size);
-  height: var(--size);
-  background: rgba(255,255,255,0.3);
-  border-radius: 50%;
-  left: var(--left);
-  animation: floatBubble var(--duration) infinite linear;
+/* Animation */
+@keyframes bubble {
+  from { transform: translateY(0);}
+  to { transform: translateY(-110vh);}
 }
-@keyframes floatBubble { from { transform: translateY(0);} to { transform: translateY(-110vh);} }
 
-.star {
+@keyframes lights {
+  0%{opacity:0.4;transform:scale(1);}
+  50%{opacity:1;transform:scale(1.5);}
+  100%{opacity:0.4;transform:scale(1);}
+}
+
+@keyframes star {
+    from{transform:translateY(0);}
+    to{transform:translateY(-120vh);}
+}
+
+@keyframes lune {
+  0% { box-shadow: 0 0 10px #fffacd; }
+  100% { box-shadow: 0 0 30px #fffacd; }
+}
+
+@keyframes shoot-diagonal {
+  0% {
+    transform: translate(0,0);
+  }
+  100% {
+    transform: translate(120vw, -100vh); /* diagonale vers haut-gauche */
+  }
+}
+
+/* Lights */
+.lights {
   position: absolute;
   top:0;
   width: var(--size);
@@ -178,11 +233,117 @@ main {
   border-radius: 50%;
   box-shadow:0 0 12px #fffacd;
   left: var(--left);
-  animation: twinkle var(--duration) infinite alternate;
+  animation: lights var(--duration) infinite alternate;
 }
 
-@keyframes twinkle {
-  0%{opacity:0.4;transform:scale(1);}
-  50%{opacity:1;transform:scale(1.5);}
-  100%{opacity:0.4;transform:scale(1);}
+/* Bulles */
+.bubble {
+  position: absolute;
+  bottom:-50px;
+  width: var(--size);
+  height: var(--size);
+  background: rgba(255,255,255,0.3);
+  border-radius: 50%;
+  left: var(--left);
+  animation: bubble var(--duration) infinite linear;
 }
+  
+.star{
+	position:absolute;
+	bottom:-100px;
+	left:var(--left);
+	width:var(--size);
+	height:var(--size);
+	animation: star var(--duration) linear infinite;
+}
+
+/* Etoiles */
+.star{
+    background:yellow;
+    clip-path:polygon(
+        50% 0%,
+        61% 35%,
+        98% 35%,
+        68% 57%,
+        79% 91%,
+        50% 70%,
+        21% 91%,
+        32% 57%,
+        2% 35%,
+        39% 35%
+    );
+}
+
+/* Lunes */
+.lune {
+  position: absolute;
+  bottom: -100px;
+  left: var(--left);
+  width: var(--size);
+  height: var(--size);
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #fffacd, #f4e04d);
+  box-shadow: 0 0 20px #fffacd;
+  animation: bubble var(--duration) linear infinite,
+             glow 2s infinite alternate;
+}
+
+/* Conteneur qui bouge */
+.shooting-star {
+  position: absolute;
+  bottom: var(--start-bottom, 0%);   /* hauteur de départ */
+  left: var(--start-left, 100vw);    /* départ hors écran à droite */
+  width: 250px;                      /* espace pour la traînée */
+  height: 30px;
+  animation: shoot-diagonal var(--duration) linear infinite;
+  z-index: 10;
+}
+
+/* Traînée inclinée */
+.trail {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  width: 150px;
+  height: 6px;
+
+  background: linear-gradient(
+    to left,
+    rgba(255,255,255,0.8),
+    rgba(255,255,255,0.4),
+    rgba(255,255,255,0)
+  );
+
+  filter: blur(4px);
+  z-index: 5;
+
+  transform: translateY(-50%) rotate(-25deg); /* inclinaison diagonale */
+  transform-origin: right center; /* pivot sur le bord droit (étoile) */
+}
+
+/* Étoile */
+.star-shape {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 25px;
+  height: 25px;
+
+  background: #fcf112;
+  clip-path: polygon(
+      50% 0%,
+      61% 35%,
+      98% 35%,
+      68% 57%,
+      79% 91%,
+      50% 70%,
+      21% 91%,
+      32% 57%,
+      2% 35%,
+      39% 35%
+  );
+  box-shadow: 0 0 15px #ffd700, 0 0 30px #ffff66;
+  z-index: 10;
+}
+
