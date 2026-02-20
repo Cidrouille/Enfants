@@ -2,68 +2,380 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Apprendre en s'amusant</title>
-    <link rel="stylesheet" href="Accueil.css">
+    <title>Jeu des Animaux</title>
+    <link rel="stylesheet" href="Animaux.css">
 </head>
 <body>
 
+<div class="background">
+     <!-- Bulles -->
+    <span class="bubble" style="--size:30px; --left:10%; --duration:12s;"></span>
+    <span class="bubble" style="--size:50px; --left:70%; --duration:15s;"></span>
+    <span class="bubble" style="--size:40px; --left:40%; --duration:18s;"></span>
+    <span class="bubble" style="--size:25px; --left:80%; --duration:10s;"></span>
+
+    <!-- Lumières -->
+    <span class="lights" style="--size:12px; --left:15%; --duration:8s;"></span>
+    <span class="lights" style="--size:10px; --left:45%; --duration:10s;"></span>
+    <span class="lights" style="--size:14px; --left:70%; --duration:12s;"></span>
+	
+	<!-- Etoiles -->
+	<span class="star" style="--size:18px; --left:15%; --duration:12s;"></span>
+    <span class="star" style="--size:12px; --left:45%; --duration:8s;"></span>
+	<span class="star" style="--size:25px; --left:85%; --duration:10s;"></span>
+	
+	<!-- Lunes -->
+	<span class="lune" style="--size:18px; --left:20%; --duration:10s;"></span>
+    <span class="lune" style="--size:12px; --left:50%; --duration:15s;"></span>
+	<span class="lune" style="--size:25px; --left:90%; --duration:13s;"></span>
+	
+	<div class="shooting-star" style="--size:25px; --duration:5s; --start-left:0vw; --start-bottom:65%;">
+	  <div class="trail"></div>
+	  <div class="star-shape"></div>
+	</div>
+	<div class="shooting-star" style="--size:25px; --duration:6s; --start-left:0vw; --start-bottom:10%;">
+	  <div class="trail"></div>
+	  <div class="star-shape"></div>
+	</div>
+	<div class="shooting-star" style="--size:25px; --duration:7s; --start-left:50vw; --start-bottom:0%;">
+	  <div class="trail"></div>
+	  <div class="star-shape"></div>
+	</div>
+	
+	<div id="cursor-trail"></div>
+</div>
+
 <header>
-    <h1>🌟 Apprendre en s'amusant 🌟</h1>
-    <p>Découvre, joue et deviens super fort !</p>
+    <div class="header-left">
+        <button id="goHomeBtn">Changer de jeu</button>
+        <button id="changeThemeBtn" style="display:none;">Changer de thème</button>
+    </div>
+    <h1><img src="images/Titre.png" alt="Jeu des Animaux" id="titleImg"></h1>
 </header>
 
-<main class="cards">
-
-    <div class="card maths">
-        <div class="emoji">🔢</div>
-        <h2>Les Maths</h2>
-        <p>Additions, multiplications et défis rigolos.</p>
-        <a href="#">Jouer</a>
+<main>
+    <!-- Menu des thèmes -->
+    <div id="themeMenu">
+        <div class="theme-card" data-theme="savanne">
+            <span>🌵</span><p>Savanne</p>
+        </div>
+        <div class="theme-card" data-theme="jungle">
+            <span>🌴</span><p>Jungle</p>
+        </div>
+        <div class="theme-card" data-theme="basse-cour">
+            <span>🏡</span><p>Basse-cour</p>
+        </div>
+        <div class="theme-card" data-theme="glace">
+            <span>❄️</span><p>Glace</p>
+        </div>
+		<div class="theme-card" data-theme="ocean">
+            <span>🌊</span><p>Océan</p>
+        </div>
     </div>
 
-    <div class="card animaux">
-        <div class="emoji">🐼</div>
-        <h2>Animaux</h2>
-        <p>Devine les animaux et leurs sons.</p>
-        <a href="Animaux.html">Jouer</a>
-    </div>
+    <!-- Zone de jeu -->
+    <div id="gameArea" style="display:none;">
+        <div id="animalDisplay">
+            <img id="animalImg" src="" alt="animal" />
+        </div>
 
-    <div class="card jeux">
-        <div class="emoji">🎮</div>
-        <h2>Jeux</h2>
-        <p>Apprendre en s’amusant.</p>
-        <a href="#">Jouer</a>
-    </div>
+        <div class="choices">
+            <button class="choice"></button>
+            <button class="choice"></button>
+            <button class="choice"></button>
+        </div>
 
-    <div class="card sudoku">
-        <div class="emoji">🧩</div>
-        <h2>Sudoku</h2>
-        <p>Apprendre en s’amusant.</p>
-        <a href="Sudoku.html">Jouer</a>
+        <p id="message"></p>
+        <button id="nextBtn">Animal suivant →</button>
     </div>
-
-    <div class="card couleurs">
-        <div class="emoji">🎨</div>
-        <h2>Les Couleurs</h2>
-        <p>Apprends à reconnaître les couleurs en jouant.</p>
-        <a href="Couleurs.html">Jouer</a>
-    </div>
-
-    <div class="card bonus">
-        <div class="emoji">🚀</div>
-        <h2>Bonus</h2>
-        <p>Nouveautés bientôt !</p>
-        <a href="#">Voir</a>
-    </div>
-
 </main>
 
-<footer>
-    <p>Site éducatif pour enfants ✨</p>
-</footer>
+<script>
+/* ===== DONNEES ===== */
+const animaux = [
+    {name: "Lion", img: "images/Savanne/lion.png", theme: "savanne"},
+	{name: "Eléphant", img: "images/Savanne/elephant.png", theme: "savanne"},
+	{name: "Hippopotame", img: "images/Savanne/hippopotame.png", theme: "savanne"},
+	{name: "Rhinocéros", img: "images/Savanne/rhinoceros.png", theme: "savanne"},
+	{name: "Dromadaire", img: "images/Savanne/dromadaire.png", theme: "savanne"},
+	{name: "Lionne", img: "images/Savanne/lionne.png", theme: "savanne"},
+	{name: "Zèbre", img: "images/Savanne/zebre.png", theme: "savanne"},
+	{name: "Antilope", img: "images/Savanne/antilope.png", theme: "savanne"},
+	{name: "Girafe", img: "images/Savanne/girafe.png", theme: "savanne"},
+	{name: "Crocodile", img: "images/Savanne/crocodile.png", theme: "savanne"},
+	{name: "Aigle", img: "images/Savanne/aigle.png", theme: "savanne"},
+	{name: "Kangourou", img: "images/Savanne/kangourou.png", theme: "savanne"},
+	{name: "Gnou", img: "images/Savanne/gnou.png", theme: "savanne"},
+	{name: "Babouin", img: "images/Savanne/babouin.png", theme: "savanne"},
+	{name: "Hyène", img: "images/Savanne/hyene.png", theme: "savanne"},
+	{name: "Jaguar", img: "images/Savanne/jaguar.png", theme: "savanne"},
+	{name: "Phacochère", img: "images/Savanne/phacochere.png", theme: "savanne"},
+	{name: "Suricate", img: "images/Savanne/suricate.png", theme: "savanne"},
+	{name: "Buffle", img: "images/Savanne/buffle.png", theme: "savanne"},
+	
+	{name: "Serpent", img: "images/Jungle/serpent.png", theme: "jungle"},
+	{name: "Koala", img: "images/Jungle/koala.png", theme: "jungle"},
+	{name: "Grenouille", img: "images/Jungle/grenouille.png", theme: "jungle"},
+	{name: "Ecureuil", img: "images/Jungle/ecureuil.png", theme: "jungle"},
+	{name: "Caméléon", img: "images/Jungle/cameleon.png", theme: "jungle"},
+	{name: "Tortue", img: "images/Jungle/tortue.png", theme: "jungle"},
+	{name: "Tigre", img: "images/Jungle/tigre.png", theme: "jungle"},
+	{name: "Ours brun", img: "images/Jungle/ours brun.png", theme: "jungle"},
+	{name: "Panda", img: "images/Jungle/panda.png", theme: "jungle"},
+	{name: "Perroquet", img: "images/Jungle/perroquet.png", theme: "jungle"},
+	{name: "Toucan", img: "images/Jungle/toucan.png", theme: "jungle"},
+	{name: "Elan", img: "images/Jungle/elan.png", theme: "jungle"},
+	{name: "Renard", img: "images/Jungle/renard.png", theme: "jungle"},
+	{name: "Coccinelle", img: "images/Jungle/coccinelle.png", theme: "jungle"},
+	
+	{name: "Chien", img: "images/Basse cour/chien.png", theme: "basse-cour"},
+	{name: "Chat", img: "images/Basse cour/chat.png", theme: "basse-cour"},
+	{name: "Cochon", img: "images/Basse cour/cochon.png", theme: "basse-cour"},
+	{name: "Mouton", img: "images/Basse cour/mouton.png", theme: "basse-cour"},
+	{name: "Cheval", img: "images/Basse cour/cheval.png", theme: "basse-cour"},
+	{name: "Vache", img: "images/Basse cour/vache.png", theme: "basse-cour"},
+	{name: "Lapin", img: "images/Basse cour/lapin.png", theme: "basse-cour"},
+	{name: "Oiseau", img: "images/Basse cour/oiseau.png", theme: "basse-cour"},
+	{name: "Paon", img: "images/Basse cour/paon.png", theme: "basse-cour"},
+	{name: "Raton laveur", img: "images/Basse cour/raton laveur.png", theme: "basse-cour"},
+	{name: "Abeille", img: "images/Basse cour/abeille.png", theme: "basse-cour"},
+	{name: "Pigeon", img: "images/Basse cour/pigeon.png", theme: "basse-cour"},
+	{name: "Poule", img: "images/Basse cour/poule.png", theme: "basse-cour"},
+	{name: "Chèvre", img: "images/Basse cour/chevre.png", theme: "basse-cour"},
+	{name: "Dinde", img: "images/Basse cour/dinde.png", theme: "basse-cour"},
+	{name: "Canard", img: "images/Basse cour/canard.png", theme: "basse-cour"},
+	{name: "Ane", img: "images/Basse cour/ane.png", theme: "basse-cour"},
+	
+	{name: "Baleine", img: "images/Ocean/baleine.png", theme: "ocean"},
+	{name: "Dauphin", img: "images/Ocean/dauphin.png", theme: "ocean"},
+	{name: "Raie", img: "images/Ocean/raie.png", theme: "ocean"},
+	{name: "Thon", img: "images/Ocean/thon.png", theme: "ocean"},
+	{name: "Tortue", img: "images/Ocean/tortue.png", theme: "ocean"},
+	{name: "Crabe", img: "images/Ocean/crabe.png", theme: "ocean"},
+	{name: "Flamant rose", img: "images/Ocean/flamant rose.png", theme: "ocean"},
+	{name: "Requin baleine", img: "images/Ocean/requin baleine.png", theme: "ocean"},
+	{name: "Requin", img: "images/Ocean/requin.png", theme: "ocean"},
+	{name: "Cachalot", img: "images/Ocean/cachalot.png", theme: "ocean"},
+	{name: "Méduse", img: "images/Ocean/meduse.png", theme: "ocean"},
+	{name: "Hippocampe", img: "images/Ocean/hippocampe.png", theme: "ocean"},
+	{name: "Pieuvre", img: "images/Ocean/pieuvre.png", theme: "ocean"},
+	{name: "Etoile de mer", img: "images/Ocean/etoile de mer.png", theme: "ocean"},
+	{name: "Corail", img: "images/Ocean/corail.png", theme: "ocean"},
+	{name: "Poisson clown", img: "images/Ocean/poisson clown.png", theme: "ocean"},
+	{name: "Poisson globe", img: "images/Ocean/poisson globe.png", theme: "ocean"},
+	{name: "Coquillage", img: "images/Ocean/coquillage.png", theme: "ocean"},
+	{name: "Calamar", img: "images/Ocean/calamar.png", theme: "ocean"},
+	{name: "Homard", img: "images/Ocean/homard.png", theme: "ocean"},
+	
+	{name: "Pingouin", img: "images/Glace/pingouin.png", theme: "glace"},
+	{name: "Ours polaire", img: "images/Glace/ours polaire.png", theme: "glace"},
+	{name: "Loup", img: "images/Glace/loup.png", theme: "glace"}
+];
 
+/* Fond par thème */
+const themeBackgrounds = {
+    "savanne": "url('images/Savanne/Savanne.png') no-repeat center center / cover",
+    "jungle": "url('images/Jungle/Jungle.png') no-repeat center center / cover",
+    "basse-cour": "url('images/Basse cour/Basse cour.png') no-repeat center center / cover",
+    "glace": "url('images/Glace/Glace.png') no-repeat center center / cover",
+	"ocean": "url('images/Ocean/Ocean.png') no-repeat center center / cover",
+};
+
+/* ===== ELEMENTS ===== */
+const themeCards = document.querySelectorAll(".theme-card");
+const themeMenu = document.getElementById("themeMenu");
+const gameArea = document.getElementById("gameArea");
+const animalImg = document.getElementById("animalImg");
+const buttons = document.querySelectorAll(".choice");
+const message = document.getElementById("message");
+const nextBtn = document.getElementById("nextBtn");
+const goHomeBtn = document.getElementById("goHomeBtn");
+const changeThemeBtn = document.getElementById("changeThemeBtn");
+
+let currentAnimals = [];
+let correctAnimal;
+
+function shuffle(array){ return array.sort(() => Math.random()-0.5); }
+
+/* ===== CLICK SUR THEME ===== */
+themeCards.forEach(card => {
+    card.onclick = () => {
+        const theme = card.dataset.theme;
+        currentAnimals = animaux.filter(a => a.theme === theme);
+        if(currentAnimals.length === 0){
+            alert("Aucun animal pour ce thème !");
+            return;
+        }
+
+        // Appliquer le fond du thème
+        document.body.style.background = themeBackgrounds[theme];
+
+        themeMenu.style.display = "none";
+        gameArea.style.display = "flex";
+
+        // Afficher le bouton changer de thème
+        changeThemeBtn.style.display = "inline-block";
+
+        startGame();
+    }
+});
+
+/* ===== DEMARRER UNE PARTIE ===== */
+function startGame(){
+    message.textContent = "";
+    nextBtn.style.display = "none";
+
+    buttons.forEach(btn=>{
+        btn.classList.remove("good","bad","click-anim");
+        btn.disabled=false;
+        btn.style.background = "linear-gradient(45deg,#ffffff,#f1f3f5)";
+        btn.style.color = "black";
+    });
+
+    // Animal correct aléatoire dans le thème
+    correctAnimal = currentAnimals[Math.floor(Math.random() * currentAnimals.length)];
+    animalImg.src = correctAnimal.img;
+
+    // Créer liste de réponses
+    let choices = [correctAnimal];
+
+    // Mélanger les animaux du thème
+    let shuffled = [...currentAnimals].sort(() => Math.random() - 0.5);
+
+    // Ajouter 2 faux animaux différents
+    shuffled.forEach(a => {
+        if(choices.length < 3 && a !== correctAnimal){
+            choices.push(a);
+        }
+    });
+
+    // Mélanger les réponses finales
+    choices = shuffle(choices);
+
+    buttons.forEach((btn,i)=>{
+        btn.textContent = choices[i].name;
+        btn.onclick = ()=>checkAnswer(btn, choices[i]);
+    });
+}
+
+
+/* ===== CHECK REPONSE ===== */
+function checkAnswer(btn, animal){
+    btn.classList.add("click-anim");
+    if(animal === correctAnimal){
+        btn.style.background = "#69db7c";
+        btn.style.color = "#fff";
+        message.textContent = "🎉 Bravo ! Bonne réponse !";
+        nextBtn.style.display = "inline-block";
+
+        buttons.forEach(b=>{
+            if(b !== btn) {
+                b.style.background = "#ff6b6b";
+                b.style.color = "#fff";
+                b.disabled = true;
+            } else b.disabled = true;
+        });
+    } else {
+        btn.style.background = "#ff6b6b";
+        btn.style.color = "#fff";
+        btn.disabled = true;
+        message.textContent = "❌ Essaie encore !";
+    }
+}
+
+/* ===== BOUTONS ===== */
+nextBtn.onclick = startGame;
+
+changeThemeBtn.onclick = () => {
+    gameArea.style.display = "none";
+    themeMenu.style.display = "flex";
+    changeThemeBtn.style.display = "none";
+
+    // Remettre le fond initial
+    document.body.style.background = "linear-gradient(135deg,#f6d365,#fda085)";
+};
+
+goHomeBtn.onclick = () => {
+    window.location.href = "Accueil.html";
+};
+
+// TRAÎNÉE ARC-EN-CIEL FLUIDE LÉGÈRE
+const trailCanvas = document.createElement("canvas");
+trailCanvas.style.position = "fixed";
+trailCanvas.style.top = "0";
+trailCanvas.style.left = "0";
+trailCanvas.style.pointerEvents = "none";
+trailCanvas.style.zIndex = "9999";
+document.body.appendChild(trailCanvas);
+
+const ctx = trailCanvas.getContext("2d");
+let width = window.innerWidth;
+let height = window.innerHeight;
+trailCanvas.width = width;
+trailCanvas.height = height;
+
+window.addEventListener("resize", () => {
+    width = window.innerWidth;
+    height = window.innerHeight;
+    trailCanvas.width = width;
+    trailCanvas.height = height;
+});
+
+let mouseX = width/2;
+let mouseY = height/2;
+let lastMove = Date.now();
+
+document.addEventListener("mousemove", e => {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+    lastMove = Date.now();
+});
+
+const trail = [];
+const maxTrail = 10; // moins de points => traînée plus courte
+
+function animateTrailCanvas() {
+    ctx.clearRect(0,0,width,height);
+
+    // ajoute la nouvelle position
+    trail.push({x: mouseX, y: mouseY, time: Date.now()});
+    if(trail.length > maxTrail) trail.shift();
+
+    for(let i=0; i<trail.length-1; i++){
+        const p = trail[i];
+        const next = trail[i+1];
+        const alpha = 0.8 * (1 - i / trail.length); // plus subtil
+
+        const hue = (i*30 + Date.now()/10)%360;
+        ctx.strokeStyle = `hsla(${hue},100%,60%,${alpha})`;
+        ctx.lineWidth = 6*(alpha); 
+
+        // effet de flou léger
+        ctx.shadowBlur = 8;
+        ctx.shadowColor = ctx.strokeStyle;
+
+        ctx.beginPath();
+        ctx.moveTo(p.x, p.y);
+        ctx.lineTo(next.x, next.y);
+        ctx.stroke();
+    }
+
+    // efface si souris immobile > 300ms
+    if(Date.now() - lastMove > 300){
+        trail.length = 0;
+    }
+
+    requestAnimationFrame(animateTrailCanvas);
+}
+
+animateTrailCanvas();
+
+</script>
 </body>
 </html>
+
+
+
 
 
 
