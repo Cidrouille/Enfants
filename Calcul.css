@@ -46,16 +46,14 @@ header {
   border-bottom-right-radius: 40px;
   color:white;
   text-align: center;
-  
 }
-header h1 {
-  font-size: 2em;
+
+.title-text {
+  font-size: 1em;
   font-weight: bold;
-  background: linear-gradient(90deg, red, orange, yellow, green, blue, indigo, violet);
-  background-size: 400% 100%;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  animation: rainbow 5s linear infinite;
+  background: linear-gradient(90deg, #bdb2ff, #a0a0ff, #7b2cbf);
+  -webkit-background-clip: text; /* clip le fond sur le texte */
+  -webkit-text-fill-color: transparent; /* rend le texte transparent pour voir le gradient */
 }
 
 .header-left {
