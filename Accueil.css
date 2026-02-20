@@ -61,7 +61,7 @@ header {
 
 /* Couleurs des cartes */
 
-.maths { background: #ffadad; }
+.maths { background: #bdb2ff; }
 .animaux { background: #caffbf; }
 .jeux { background: #9bf6ff; }
 .couleurs { background: #ffc6ff; }
@@ -77,5 +77,4 @@ footer {
   border-top-left-radius: 40px;
   border-top-right-radius: 40px;
 }
-
 
