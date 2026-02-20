@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Calcul mental</title>
+<link rel="stylesheet" href="Calcul.css">
+</head>
+<body>
+
+<div class="background">
+    <!-- Bulles -->
+    <span class="bubble" style="--size:30px; --left:10%; --duration:12s;"></span>
+    <span class="bubble" style="--size:50px; --left:70%; --duration:15s;"></span>
+    <span class="bubble" style="--size:40px; --left:40%; --duration:18s;"></span>
+    <span class="bubble" style="--size:25px; --left:80%; --duration:10s;"></span>
+
+    <!-- Lumières -->
+    <span class="lights" style="--size:12px; --left:15%; --duration:8s;"></span>
+    <span class="lights" style="--size:10px; --left:45%; --duration:10s;"></span>
+    <span class="lights" style="--size:14px; --left:70%; --duration:12s;"></span>
+	
+	<!-- Etoiles -->
+	<span class="star" style="--size:18px; --left:15%; --duration:12s;"></span>
+    <span class="star" style="--size:12px; --left:45%; --duration:8s;"></span>
+	<span class="star" style="--size:25px; --left:85%; --duration:10s;"></span>
+	
+	<!-- Lunes -->
+	<span class="lune" style="--size:18px; --left:20%; --duration:10s;"></span>
+    <span class="lune" style="--size:12px; --left:50%; --duration:15s;"></span>
+	<span class="lune" style="--size:25px; --left:90%; --duration:13s;"></span>
+	
+	<div class="shooting-star" style="--size:25px; --duration:5s; --start-left:0vw; --start-bottom:65%;">
+	  <div class="trail"></div>
+	  <div class="star-shape"></div>
+	</div>
+	<div class="shooting-star" style="--size:25px; --duration:6s; --start-left:0vw; --start-bottom:10%;">
+	  <div class="trail"></div>
+	  <div class="star-shape"></div>
+	</div>
+	<div class="shooting-star" style="--size:25px; --duration:7s; --start-left:50vw; --start-bottom:0%;">
+	  <div class="trail"></div>
+	  <div class="star-shape"></div>
+	</div>
+	
+	<div id="cursor-trail"></div>
+</div>
+
+<header>
+    <div class="header-left">
+        <button id="goHomeBtn">Changer de jeu</button>
+    </div>
+    <h1>🔢 Calcul mental</h1>
+</header>
+
+<script>
+
+goHomeBtn.onclick = () => {
+    window.location.href = "Accueil.html";
+};
+
+</script>
+
+</body>
+</html>
