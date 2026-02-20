@@ -10,20 +10,85 @@ body{
     overflow:hidden;
 }
 
-/* ========================= */
-/* HEADER */
-/* ========================= */
-
-header{
-    text-align:center;
-    padding:20px;
-    position:relative;
+/* Curseur par défaut sur tout le corps */
+body, a, button {
+    cursor: url('images/curseur.png'), auto; /* centre du curseur */
 }
 
-.header-left{
-    position:absolute;
-    top:20px;
-    left:20px;
+/* Facultatif : si tu veux que le curseur reste la main même sur hover ou éléments spéciaux */
+a:hover, button:hover {
+    cursor: url('images/curseur2.png'), auto;
+}
+
+#goHomeBtn:hover, .curseur2:hover {
+    cursor: url('images/curseur2.png'), auto;
+}
+
+/* PARTICULES DE LA TRAÎNÉE */
+.cursor-trail {
+    position: fixed;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: conic-gradient(red, orange, yellow, green, blue, indigo, violet);
+    pointer-events: none;
+    filter: blur(3px);
+    transition: transform 0.1s;
+    z-index: 9999;
+}
+
+
+/* HEADER */
+header {
+  background: linear-gradient(45deg,#ff9aa2,#ffdac1);
+  padding: 40px;
+  border-bottom-left-radius: 40px;
+  border-bottom-right-radius: 40px;
+  color:white;
+  text-align: center;
+  
+}
+header h1 {
+  font-size: 2em;
+  font-weight: bold;
+  background: linear-gradient(90deg, red, orange, yellow, green, blue, indigo, violet);
+  background-size: 400% 100%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: rainbow 5s linear infinite;
+}
+
+.header-left {
+  position: absolute;
+  top: 40px;
+  left: 200px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 220px;  /* largeur fixe du conteneur */
+}
+
+.header-left button {
+  padding: 12px 30px;
+  min-width: 160px;      /* force une largeur identique */
+  border: none;
+  border-radius: 30px;
+  font-size: 18px;        /* taille uniforme */
+  font-weight: bold;
+  background: linear-gradient(45deg,#70e1f5,#a1f7ff);
+  color: black;
+  cursor: pointer;
+  transition: transform 0.3s;
+  text-align: center;     /* assure que le texte reste centré */
+}
+
+.header-left button:hover { transform: scale(1.1); }
+
+header h1 {
+  font-size: 2em;
+  font-weight: bold;
+  margin: 0;
+}
 }
 
 button{
@@ -52,6 +117,7 @@ button:hover{
     width:fit-content;      /* 🔥 IMPORTANT */
     border:3px solid black; /* contour uniquement autour de la grille */
     box-shadow:0 8px 20px rgba(0,0,0,0.2);
+
 }
 
 /* Cases */
@@ -64,6 +130,7 @@ button:hover{
     outline:none;
     box-sizing:border-box;
     transition:0.2s;
+	z-index: 2;  /* devant le fond */
 }
 
 .cell:focus{
@@ -101,6 +168,28 @@ button:hover{
 .controls{
     text-align:center;
     margin-top:25px;
+	z-index: 2;  /* devant le fond */
+}
+
+.controls button {
+    padding: 12px 30px;                        /* même que header-left */
+    min-width: 160px;                          /* largeur uniforme */
+    border: none;
+    border-radius: 30px;                        /* arrondi */
+    font-size: 18px;                            /* même taille texte */
+    font-weight: bold;
+    text-align: center;
+    background: linear-gradient(45deg, #70e1f5, #a1f7ff);  /* dégradé bleu */
+    color: black;
+    cursor: pointer;
+    transition: transform 0.3s;
+	position: relative;
+	z-index: 2;
+}
+
+.controls button:hover {
+    transform: scale(1.1);                     /* effet hover identique */
+
 }
 
 #message{
@@ -108,33 +197,123 @@ button:hover{
     font-size:18px;
     margin-top:15px;
     font-weight:bold;
+	z-index: 2;  /* devant le fond */
+}
+
+.difficulty {
+    position: fixed;
+    top: 50%;
+    right: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    transform: translateY(-50%);
+    z-index: 2;  /* au-dessus du fond */
+}
+
+.difficulty .diff-btn {
+    padding: 12px 30px;
+    min-width: 120px;
+    border: none;
+    border-radius: 30px;
+    font-size: 16px;
+    font-weight: bold;
+    background: linear-gradient(45deg,#70e1f5,#a1f7ff);
+    color: black;
+    cursor: pointer;
+    transition: transform 0.3s;
+    text-align: center;
+}
+
+.difficulty .diff-btn:hover {
+    transform: scale(1.1);
+}
+
+
+
+.background {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    z-index: 0;            /* fond derrière tout le contenu */
+    pointer-events: none;  /* clics passent à travers */
 }
 
 /* ========================= */
 /* BACKGROUND ANIMATION */
 /* ========================= */
 
-.background{
-    position:fixed;
-    width:100%;
-    height:100%;
-    overflow:hidden;
-    z-index:-1;
+/* Animation */
+@keyframes bubble {
+  from { transform: translateY(0);}
+  to { transform: translateY(-110vh);}
 }
 
-.bubble, .star{
-    position:absolute;
-    bottom:-100px;
-    left:var(--left);
-    width:var(--size);
-    height:var(--size);
-    animation:float var(--duration) linear infinite;
+@keyframes lights {
+  0%{opacity:0.4;transform:scale(1);}
+  50%{opacity:1;transform:scale(1.5);}
+  100%{opacity:0.4;transform:scale(1);}
+}
+
+@keyframes star {
+    from{transform:translateY(0);}
+    to{transform:translateY(-120vh);}
+}
+
+@keyframes lune {
+  0% { box-shadow: 0 0 10px #fffacd; }
+  100% { box-shadow: 0 0 30px #fffacd; }
+}
+
+@keyframes shoot-diagonal {
+  0% {
+    transform: translate(0,0);
+  }
+  100% {
+    transform: translate(120vw, -100vh); /* diagonale vers haut-gauche */
+  }
+}
+
+/* Tous les éléments du fond */
+.bubble, .star, .lune, .lights, .shooting-star, .trail, .star-shape {
+    z-index: 0;           /* s'assure qu'ils restent derrière */
+}
+
+
+/* Lights */
+.lights {
+  position: absolute;
+  top:0;
+  width: var(--size);
+  height: var(--size);
+  background: #fffacd;
+  border-radius: 50%;
+  box-shadow:0 0 12px #fffacd;
+  left: var(--left);
+  animation: lights var(--duration) infinite alternate;
 }
 
 /* Bulles */
-.bubble{
-    background:rgba(255,255,255,0.3);
-    border-radius:50%;
+.bubble {
+  position: absolute;
+  bottom:-50px;
+  width: var(--size);
+  height: var(--size);
+  background: rgba(255,255,255,0.3);
+  border-radius: 50%;
+  left: var(--left);
+  animation: bubble var(--duration) infinite linear;
+}
+  
+.star{
+	position:absolute;
+	bottom:-100px;
+	left:var(--left);
+	width:var(--size);
+	height:var(--size);
+	animation: star var(--duration) linear infinite;
 }
 
 /* Etoiles */
@@ -154,8 +333,76 @@ button:hover{
     );
 }
 
-/* Animation */
-@keyframes float{
-    from{transform:translateY(0);}
-    to{transform:translateY(-120vh);}
+/* Lunes */
+.lune {
+  position: absolute;
+  bottom: -100px;
+  left: var(--left);
+  width: var(--size);
+  height: var(--size);
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #fffacd, #f4e04d);
+  box-shadow: 0 0 20px #fffacd;
+  animation: bubble var(--duration) linear infinite,
+             glow 2s infinite alternate;
 }
+
+/* Conteneur qui bouge */
+.shooting-star {
+  position: absolute;
+  bottom: var(--start-bottom, 0%);   /* hauteur de départ */
+  left: var(--start-left, 100vw);    /* départ hors écran à droite */
+  width: 250px;                      /* espace pour la traînée */
+  height: 30px;
+  animation: shoot-diagonal var(--duration) linear infinite;
+  z-index: 10;
+}
+
+/* Traînée inclinée */
+.trail {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  width: 150px;
+  height: 6px;
+
+  background: linear-gradient(
+    to left,
+    rgba(255,255,255,0.8),
+    rgba(255,255,255,0.4),
+    rgba(255,255,255,0)
+  );
+
+  filter: blur(4px);
+  z-index: 5;
+
+  transform: translateY(-50%) rotate(-25deg); /* inclinaison diagonale */
+  transform-origin: right center; /* pivot sur le bord droit (étoile) */
+}
+
+/* Étoile */
+.star-shape {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 25px;
+  height: 25px;
+
+  background: #fcf112;
+  clip-path: polygon(
+      50% 0%,
+      61% 35%,
+      98% 35%,
+      68% 57%,
+      79% 91%,
+      50% 70%,
+      21% 91%,
+      32% 57%,
+      2% 35%,
+      39% 35%
+  );
+  box-shadow: 0 0 15px #ffd700, 0 0 30px #ffff66;
+  z-index: 10;
+}
+
