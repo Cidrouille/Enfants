@@ -20,7 +20,7 @@ a:hover, button:hover {
     cursor: url('images/curseur2.png'), auto;
 }
 
-#goHomeBtn:hover {
+#goHomeBtn:hover, #nextBtn:hover {
     cursor: url('images/curseur2.png'), auto;
 }
 
@@ -337,5 +337,4 @@ main {
   box-shadow: 0 0 15px #ffd700, 0 0 30px #ffff66;
   z-index: 10;
 }
-
 
