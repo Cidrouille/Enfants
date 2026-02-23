@@ -10,17 +10,17 @@ body{
     overflow:hidden;
 }
 
-/* Curseur par défaut sur tout le corps */
-body, a, button {
-    cursor: url('images/curseur.png'), auto; /* centre du curseur */
+/* Curseur normal */
+body, a, input, button {
+    cursor: url('images/curseur.png'), auto;
 }
 
-/* Facultatif : si tu veux que le curseur reste la main même sur hover ou éléments spéciaux */
-a:hover, button:hover {
-    cursor: url('images/curseur2.png'), auto;
+/* Curseur sur bouton / éléments cliquables */
+button:hover, .types button:hover, .levels button:hover, #submit-answer:hover {
+    cursor: url('images/curseur2.png'), pointer;
 }
 
-#goHomeBtn:hover {
+#goHomeBtn:hover, #changeNiveauBtn:hover {
     cursor: url('images/curseur2.png'), auto;
 }
 
