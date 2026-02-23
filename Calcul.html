@@ -94,6 +94,24 @@ const userAnswer = document.getElementById("user-answer");
 const submitBtn = document.getElementById("submit-answer");
 const feedback = document.getElementById("feedback");
 
+/* =========================
+   SONS
+========================= */
+
+const matchSound = new Audio("sounds/match.mp3");
+
+/* évite le délai au premier son */
+
+matchSound.preload = "auto";
+matchSound.volume = 0.10;
+
+/* petit helper pour rejouer rapidement */
+function playSound(sound){
+    sound.currentTime = 0;
+    sound.play();
+}
+
+
 // Bouton “Changer de jeu” renvoie à Accueil.html
 goHomeBtn.addEventListener("click", () => {
     window.location.href = "Accueil.html";
@@ -197,6 +215,7 @@ function generateCalculation() {
 submitBtn.addEventListener("click", () => {
     const userVal = parseFloat(userAnswer.value);
     if(userVal === correctAnswer){
+		playSound(matchSound);
         feedback.textContent = "✅ Bravo !";
         generateCalculation(); // nouveau calcul
     } else {
