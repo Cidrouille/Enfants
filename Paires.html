@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Jeu des Paires</title>
+<link rel="stylesheet" href="Paires.css">
+</head>
+<body>
+
+<div class="background">
+    <!-- Bulles, lumières, étoiles, lunes, shooting stars -->
+    <span class="bubble" style="--size:30px; --left:10%; --duration:12s;"></span>
+    <span class="bubble" style="--size:50px; --left:70%; --duration:15s;"></span>
+    <span class="bubble" style="--size:40px; --left:40%; --duration:18s;"></span>
+    <span class="bubble" style="--size:25px; --left:80%; --duration:10s;"></span>
+
+    <span class="lights" style="--size:12px; --left:15%; --duration:8s;"></span>
+    <span class="lights" style="--size:10px; --left:45%; --duration:10s;"></span>
+    <span class="lights" style="--size:14px; --left:70%; --duration:12s;"></span>
+	
+	<span class="star" style="--size:18px; --left:15%; --duration:12s;"></span>
+    <span class="star" style="--size:12px; --left:45%; --duration:8s;"></span>
+	<span class="star" style="--size:25px; --left:85%; --duration:10s;"></span>
+	
+	<span class="lune" style="--size:18px; --left:20%; --duration:10s;"></span>
+    <span class="lune" style="--size:12px; --left:50%; --duration:15s;"></span>
+	<span class="lune" style="--size:25px; --left:90%; --duration:13s;"></span>
+	
+	<div class="shooting-star" style="--size:25px; --duration:5s; --start-left:0vw; --start-bottom:65%;">
+	  <div class="trail"></div>
+	  <div class="star-shape"></div>
+	</div>
+	<div class="shooting-star" style="--size:25px; --duration:6s; --start-left:0vw; --start-bottom:10%;">
+	  <div class="trail"></div>
+	  <div class="star-shape"></div>
+	</div>
+	<div class="shooting-star" style="--size:25px; --duration:7s; --start-left:50vw; --start-bottom:0%;">
+	  <div class="trail"></div>
+	  <div class="star-shape"></div>
+	</div>
+	
+	<div id="cursor-trail"></div>
+</div>
+
+<header>
+    <div class="header-left">
+        <button id="goHomeBtn">Changer de jeu</button>
+    </div>
+    <h1>
+	  <span class="emoji">🃏</span>
+      <span class="title-text">Jeu des Paires</span>
+	</h1>
+</header>
+
+<!-- Boutons de difficulté -->
+<div class="difficulty">
+    <button class="diff-btn" data-diff="facile">Facile</button>
+    <button class="diff-btn" data-diff="moyen">Moyen</button>
+    <button class="diff-btn" data-diff="difficile">Difficile</button>
+</div>
+
+<div id="difficulty-message" style="text-align:left; color:white; font-weight:bold; margin-bottom:10px;"></div>
+<div id="moves-counter">Coups : 0</div>
+<button id="new-game-btn" class="diff-btn">Nouvelle Partie</button>
+
+<main>
+    <div id="game-board"></div>
+</main>
+
+<script>
+/* =========================
+   JEU DES PAIRES DYNAMIQUE SELON DIFFICULTÉ + LAYOUT
+========================= */
+
+const board = document.getElementById("game-board");
+const difficultyMessage = document.getElementById("difficulty-message");
+const movesCounter = document.getElementById("moves-counter");
+
+/* =========================
+   SONS
+========================= */
+
+const flipSound = new Audio("sounds/Card-flip.mp3");
+const matchSound = new Audio("sounds/match.mp3");
+const winSound = new Audio("sounds/win.mp3");
+
+/* évite le délai au premier son */
+flipSound.preload = "auto";
+flipSound.volume = 0.10;
+
+matchSound.preload = "auto";
+matchSound.volume = 0.10;
+
+winSound.preload = "auto";
+winSound.volume = 0.10;
+
+/* petit helper pour rejouer rapidement */
+function playSound(sound){
+    sound.currentTime = 0;
+    sound.play();
+}
+
+// Sélectionne uniquement les boutons de difficulté
+const diffButtons = document.querySelectorAll(".difficulty .diff-btn"); 
+const newGameBtn = document.getElementById("new-game-btn");
+
+const allSymbols = ["🐶","🐱","🐸","🐵","🐼","🦊","🐰","🐻","🐯","🐷","🦁","🐨","🐔","🐴","🐙","🦄","🐝","🦖","🐧","🐢","🐟","🦀","🐬","🐳","🦋"];
+
+let firstCard = null;
+let lockBoard = false;
+let moves = 0;
+let currentDifficulty = "facile"; // difficulté par défaut
+let totalPairs = 8; // valeur par défaut
+
+/* Fonction pour initialiser le plateau */
+function initBoard(paires){
+    board.innerHTML = ""; 
+    moves = 0;
+	matchedPairs = 0;
+    totalPairs = paires;
+    movesCounter.textContent = `Coups : 0`;
+    firstCard = null;
+    lockBoard = false;
+
+    const symbols = allSymbols.slice(0, paires);
+    let cards = [...symbols, ...symbols];
+    cards.sort(() => Math.random() - 0.5);
+
+    let cols = 5; // défaut moyen
+    if(paires === 8) cols = 4;   // facile
+    if(paires === 10) cols = 5;  // moyen
+    if(paires === 12) cols = 6;  // difficile
+
+    board.style.display = "grid";
+    board.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+    board.style.gridGap = "10px";
+
+    cards.forEach(symbol => {
+        const card = document.createElement("div");
+        card.classList.add("card");
+        card.innerHTML = `
+            <div class="card-inner">
+                <div class="card-front">🃏</div>
+                <div class="card-back">${symbol}</div>
+            </div>
+        `;
+        card.addEventListener("click", () => flipCard(card, symbol));
+        board.appendChild(card);
+    });
+}
+
+/* Retourner les cartes et compter les coups */
+function flipCard(card, symbol){
+    if(lockBoard || card.classList.contains("flipped")) return;
+
+    card.classList.add("flipped");
+	playSound(flipSound);
+
+    if(!firstCard){
+        firstCard = {card, symbol};
+        return;
+    }
+
+    moves++;
+    movesCounter.textContent = `Coups : ${moves}`;
+
+    if(firstCard.symbol === symbol){
+    spawnStars(card);
+    playSound(matchSound);
+
+    matchedPairs++;
+
+    // 🎉 victoire
+    if(matchedPairs === totalPairs){
+        setTimeout(() => {
+            playSound(winSound);
+        }, 400);
+    }
+
+    firstCard = null;
+    return;
+}
+
+    lockBoard = true;
+    setTimeout(() => {
+        card.classList.remove("flipped");
+        firstCard.card.classList.remove("flipped");
+        firstCard = null;
+        lockBoard = false;
+    }, 800);
+}
+
+/* Effet étoiles */
+function spawnStars(card){
+    const rect = card.getBoundingClientRect();
+    for(let i=0; i<5; i++){
+        const star = document.createElement("div");
+        star.classList.add("star-effect");
+        const angle = Math.random()*2*Math.PI;
+        const radius = 20 + Math.random()*20;
+        star.style.setProperty("--x", `${Math.cos(angle)*radius}px`);
+        star.style.setProperty("--y", `${Math.sin(angle)*radius}px`);
+        star.style.left = `${rect.left + rect.width/2}px`;
+        star.style.top = `${rect.top + rect.height/2}px`;
+        document.body.appendChild(star);
+        setTimeout(() => star.remove(), 600);
+    }
+}
+
+/* Affiche la difficulté actuelle */
+function updateDifficultyMessage() {
+    difficultyMessage.textContent = `Difficulté actuelle : ${currentDifficulty.toUpperCase()}`;
+}
+
+/* Bouton retour accueil */
+document.getElementById("goHomeBtn").onclick = () => {
+    window.location.href = "Accueil.html";
+};
+
+/* Événements pour changer la difficulté */
+diffButtons.forEach(btn => {
+    btn.addEventListener("click", () => {
+        const diff = btn.dataset.diff;
+        let paires;
+        if(diff === "facile") paires = 8;
+        else if(diff === "moyen") paires = 10;
+        else if(diff === "difficile") paires = 12;
+
+        currentDifficulty = diff;
+        updateDifficultyMessage();
+        initBoard(paires);
+    });
+});
+
+/* Bouton Nouvelle Partie */
+newGameBtn.addEventListener("click", () => {
+    let paires;
+    if(currentDifficulty === "facile") paires = 8;
+    else if(currentDifficulty === "moyen") paires = 10;
+    else if(currentDifficulty === "difficile") paires = 12;
+
+    initBoard(paires);
+});
+
+/* Initialisation par défaut : facile */
+initBoard(8);
+updateDifficultyMessage();
+
+/* =========================
+   TRAÎNÉE ARC-EN-CIEL
+========================= */
+const trailCanvas = document.createElement("canvas");
+trailCanvas.style.position = "fixed";
+trailCanvas.style.top = "0";
+trailCanvas.style.left = "0";
+trailCanvas.style.pointerEvents = "none";
+trailCanvas.style.zIndex = "9999";
+document.body.appendChild(trailCanvas);
+
+const ctx = trailCanvas.getContext("2d");
+let width = window.innerWidth;
+let height = window.innerHeight;
+trailCanvas.width = width;
+trailCanvas.height = height;
+
+window.addEventListener("resize", () => {
+    width = window.innerWidth;
+    height = window.innerHeight;
+    trailCanvas.width = width;
+    trailCanvas.height = height;
+});
+
+let mouseX = width/2;
+let mouseY = height/2;
+let lastMove = Date.now();
+
+document.addEventListener("mousemove", e => {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+    lastMove = Date.now();
+});
+
+const trail = [];
+const maxTrail = 10;
+
+function animateTrailCanvas(){
+    ctx.clearRect(0,0,width,height);
+    trail.push({x: mouseX, y: mouseY, time: Date.now()});
+    if(trail.length > maxTrail) trail.shift();
+
+    for(let i=0; i<trail.length-1; i++){
+        const p = trail[i];
+        const next = trail[i+1];
+        const alpha = 0.8*(1 - i/trail.length);
+        const hue = (i*30 + Date.now()/10)%360;
+        ctx.strokeStyle = `hsla(${hue},100%,60%,${alpha})`;
+        ctx.lineWidth = 6*(alpha);
+        ctx.shadowBlur = 8;
+        ctx.shadowColor = ctx.strokeStyle;
+        ctx.beginPath();
+        ctx.moveTo(p.x,p.y);
+        ctx.lineTo(next.x,next.y);
+        ctx.stroke();
+    }
+
+    if(Date.now() - lastMove > 300) trail.length = 0;
+    requestAnimationFrame(animateTrailCanvas);
+}
+
+animateTrailCanvas();
+</script>
+
+</body>
+</html>
