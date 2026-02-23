@@ -25,7 +25,7 @@ a:hover, button:hover {
 }
 
 /* PARTICULES DE LA TRAÎNÉE */
-.cursor-trail {
+cursor-trail {
     position: fixed;
     width: 14px;
     height: 14px;
@@ -41,7 +41,7 @@ a:hover, button:hover {
 /* HEADER */
 header {
   background: linear-gradient(45deg,#ff9aa2,#ffdac1);
-  padding: 40px;
+  padding: 70px;
   border-bottom-left-radius: 40px;
   border-bottom-right-radius: 40px;
   color:white;
@@ -68,7 +68,7 @@ header {
 
 .header-left button {
   padding: 12px 30px;
-  min-width: 160px;      /* force une largeur identique */
+  min-width: 225px;      /* force une largeur identique */
   border: none;
   border-radius: 30px;
   font-size: 18px;        /* taille uniforme */
@@ -82,11 +82,46 @@ header {
 
 .header-left button:hover { transform: scale(1.1); }
 
+
 header h1 {
   font-size: 2em;
   font-weight: bold;
   margin: 0;
 }
+
+/* CALCULATOR SELECTION & GAME */
+.calculator-selection, .calculator-game {
+    text-align:center;
+    margin-top: 150px; /* laisse de la place au header */
+    color: white;
+    z-index: 5;
+    position: relative;
+}
+
+.types button, .levels button, #submit-answer {
+    margin: 10px;
+    padding: 15px 25px;
+    font-size: 18px;
+    border-radius: 25px;
+    border: none;
+    cursor: pointer;
+    background: linear-gradient(45deg,#70e1f5,#a1f7ff);
+    color: black;
+    font-weight: bold;
+    transition: transform 0.3s;
+}
+
+.types button:hover, .levels button:hover, #submit-answer:hover {
+    transform: scale(1.1);
+}
+
+.calculation-box {
+    margin: 20px auto;
+    font-size: 2em;
+    background: rgba(255,255,255,0.2);
+    padding: 20px 40px;
+    border-radius: 20px;
+    display: inline-block;
 }
 
 button{

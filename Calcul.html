@@ -48,6 +48,7 @@
 <header>
     <div class="header-left">
         <button id="goHomeBtn">Changer de jeu</button>
+		<button id="changeNiveauBtn" style="display:none;">Changer de niveau</button>
     </div>
     <h1>
 	  <span class="emoji">🔢</span>
@@ -55,11 +56,171 @@
 	</h1>
 </header>
 
+<section class="calculator-selection">
+    <h2>Choisis ton type de calcul :</h2>
+    <div class="types">
+        <button class="calc-type" data-type="addition">Addition ➕</button>
+        <button class="calc-type" data-type="subtraction">Soustraction ➖</button>
+        <button class="calc-type" data-type="multiplication">Multiplication ✖️</button>
+    </div>
+
+    <div class="levels" style="display:none;">
+        <h2>Choisis ton niveau :</h2>
+        <div id="level-buttons"></div>
+    </div>
+</section>
+
+<section class="calculator-game" style="display:none;">
+    <h2>Résous le calcul :</h2>
+    <div id="current-calculation" class="calculation-box">0 + 0 = ?</div>
+    <input type="number" id="user-answer" placeholder="Ta réponse">
+    <button id="submit-answer">Valider ✅</button>
+    <div id="feedback"></div>
+</section>
+
 <script>
 
-goHomeBtn.onclick = () => {
+let selectedType = null;
+let selectedLevel = null;
+let correctAnswer = null;
+
+const levelContainer = document.getElementById("level-buttons");
+const levelsSection = document.querySelector(".levels");
+const changeNiveauBtn = document.getElementById("changeNiveauBtn");
+const goHomeBtn = document.getElementById("goHomeBtn");
+
+const currentCalc = document.getElementById("current-calculation");
+const userAnswer = document.getElementById("user-answer");
+const submitBtn = document.getElementById("submit-answer");
+const feedback = document.getElementById("feedback");
+
+// Bouton “Changer de jeu” renvoie à Accueil.html
+goHomeBtn.addEventListener("click", () => {
     window.location.href = "Accueil.html";
-};
+});
+
+// Sélection du type
+document.querySelectorAll(".calc-type").forEach(btn => {
+    btn.addEventListener("click", () => {
+        selectedType = btn.dataset.type;
+
+        if(selectedType === "multiplication"){
+            // Multiplication : aucun niveau
+            levelsSection.style.display = "none";
+            startGame();
+        } else {
+            // Addition / Soustraction : afficher niveaux
+            const levels = ["unit","tens","hundreds","thousands","decimal"];
+            const labels = ["Unités","Dizaines","Centaines","Milliers","Nombres à virgule"];
+            
+            levelContainer.innerHTML = "";
+            levels.forEach((lvl,i) => {
+                const b = document.createElement("button");
+                b.textContent = labels[i];
+                b.dataset.level = lvl;
+                b.addEventListener("click", () => {
+                    selectedLevel = lvl;
+                    startGame();
+                });
+                levelContainer.appendChild(b);
+            });
+
+            levelsSection.style.display = "block";
+        }
+    });
+});
+
+// Bouton “Changer de thème” pour revenir au menu principal
+changeNiveauBtn.addEventListener("click", () => {
+    selectedType = null;
+    selectedLevel = null;
+    document.querySelector(".calculator-selection").style.display = "block";
+    document.querySelector(".calculator-game").style.display = "none";
+    levelsSection.style.display = "none";
+    changeNiveauBtn.style.display = "none";
+});
+
+// Lancement du jeu (pour l'instant juste affichage)
+function startGame(){
+    document.querySelector(".calculator-selection").style.display = "none";
+    document.querySelector(".calculator-game").style.display = "block";
+    changeNiveauBtn.style.display = "inline-block";
+
+    const calcBox = document.getElementById("current-calculation");
+    calcBox.textContent = `Prêt à commencer : ${selectedType} ${selectedLevel ? "(" + selectedLevel + ")" : ""}`;
+}
+
+// Fonction pour générer un nombre aléatoire selon niveau
+function randomNumber(level) {
+    switch(level){
+        case "unit": return Math.floor(Math.random()*10);
+        case "tens": return Math.floor(Math.random()*90) + 10;
+        case "hundreds": return Math.floor(Math.random()*900) + 100;
+        case "thousands": return Math.floor(Math.random()*9000) + 1000;
+        case "decimal": return Math.round((Math.random()*99.9 + 0.1)*10)/10;
+        default: return 0;
+    }
+}
+
+// Fonction pour générer le calcul aléatoire
+function generateCalculation() {
+    let a,b,op;
+    if(selectedType === "addition") op = "+";
+    else if(selectedType === "subtraction") op = "-";
+    else if(selectedType === "multiplication") op = "×";
+
+    if(selectedType === "multiplication"){
+        a = Math.floor(Math.random()*13);
+        b = Math.floor(Math.random()*13);
+    } else {
+        a = randomNumber(selectedLevel);
+        b = randomNumber(selectedLevel);
+        if(selectedType === "subtraction" && b > a){ // pour éviter résultat négatif
+            [a,b] = [b,a];
+        }
+    }
+
+    currentCalc.textContent = `${a} ${op} ${b} = ?`;
+
+    switch(op){
+        case "+": correctAnswer = Math.round((a+b)*10)/10; break;
+        case "-": correctAnswer = Math.round((a-b)*10)/10; break;
+        case "×": correctAnswer = Math.round(a*b*10)/10; break;
+    }
+
+    userAnswer.value = "";
+    userAnswer.focus();
+    feedback.textContent = "";
+}
+
+// Validation de la réponse
+submitBtn.addEventListener("click", () => {
+    const userVal = parseFloat(userAnswer.value);
+    if(userVal === correctAnswer){
+        feedback.textContent = "✅ Bravo !";
+        generateCalculation(); // nouveau calcul
+    } else {
+        feedback.textContent = "❌ Essaie encore !";
+        userAnswer.focus();
+    }
+});
+
+// Écouter la touche Entrée pour valider
+userAnswer.addEventListener("keydown", (e) => {
+    if(e.key === "Enter") {
+        submitBtn.click(); // déclenche le même code que le bouton
+    }
+});
+
+// Modifier startGame pour lancer le premier calcul
+function startGame(){
+    document.querySelector(".calculator-selection").style.display = "none";
+    document.querySelector(".calculator-game").style.display = "block";
+    changeNiveauBtn.style.display = "inline-block";
+
+    // Lancer le premier calcul
+    generateCalculation();
+}
 
 // TRAÎNÉE ARC-EN-CIEL FLUIDE LÉGÈRE
 const trailCanvas = document.createElement("canvas");
