@@ -73,12 +73,13 @@ body, a, button {
 /* Couleurs des cartes */
 
 .maths { background: #bdb2ff; }
-.animaux { background: #9bf6a0; }
+.fruits { background: #9bf6a0; }
 .jeux { background: #9bf6ff; }
 .couleurs { background: #ffc6ff; }
-.bonus { background: #bdb2ff; }
+.coloriage { background: #bdb2ff; }
 .sudoku { background: #f5af5b; }
 .paires { background: #f78b77; }
+.animaux { background: #18adf0; }
 
 /* FOOTER */
 
