@@ -20,6 +20,17 @@ header {
   }
 }
 
+/* Curseur par défaut sur tout le corps */
+body, a, button {
+    cursor: url('images/curseur.png'), auto; /* centre du curseur */
+}
+
+/* Facultatif : si tu veux que le curseur reste la main même sur hover ou éléments spéciaux */
+.card:hover {
+    cursor: url('images/curseur2.png'), auto;
+}
+
+
 /* CARTES */
 
 .cards {
