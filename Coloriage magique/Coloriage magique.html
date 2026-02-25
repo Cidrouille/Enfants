@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Coloriage magique</title>
+<link rel="stylesheet" href="Coloriage magique.css">
+</head>
+<body>
+
+<div class="background">
+    <!-- Bulles -->
+    <span class="bubble" style="--size:30px; --left:10%; --duration:12s;"></span>
+    <span class="bubble" style="--size:50px; --left:70%; --duration:15s;"></span>
+    <span class="bubble" style="--size:40px; --left:40%; --duration:18s;"></span>
+    <span class="bubble" style="--size:25px; --left:80%; --duration:10s;"></span>
+
+    <!-- Lumières -->
+    <span class="lights" style="--size:12px; --left:15%; --duration:8s;"></span>
+    <span class="lights" style="--size:10px; --left:45%; --duration:10s;"></span>
+    <span class="lights" style="--size:14px; --left:70%; --duration:12s;"></span>
+	
+	<!-- Etoiles -->
+	<span class="star" style="--size:18px; --left:15%; --duration:12s;"></span>
+    <span class="star" style="--size:12px; --left:45%; --duration:8s;"></span>
+	<span class="star" style="--size:25px; --left:85%; --duration:10s;"></span>
+	
+	<!-- Lunes -->
+	<span class="lune" style="--size:18px; --left:20%; --duration:10s;"></span>
+    <span class="lune" style="--size:12px; --left:50%; --duration:15s;"></span>
+	<span class="lune" style="--size:25px; --left:90%; --duration:13s;"></span>
+	
+	<div class="shooting-star" style="--size:25px; --duration:5s; --start-left:0vw; --start-bottom:65%;">
+	  <div class="trail"></div>
+	  <div class="star-shape"></div>
+	</div>
+	<div class="shooting-star" style="--size:25px; --duration:6s; --start-left:0vw; --start-bottom:10%;">
+	  <div class="trail"></div>
+	  <div class="star-shape"></div>
+	</div>
+	<div class="shooting-star" style="--size:25px; --duration:7s; --start-left:50vw; --start-bottom:0%;">
+	  <div class="trail"></div>
+	  <div class="star-shape"></div>
+	</div>
+	
+	<div id="cursor-trail"></div>
+</div>
+
+<header>
+    <div class="header-left">
+        <button id="goHomeBtn">Changer de jeu</button>
+		<button id="changeDrawBtn">Changer de dessin</button>
+    </div>
+    <h1>
+	  <span class="emoji">🖌️</span>
+      <span class="title-text">Coloriage magique</span>
+	</h1>
+</header>
+
+<div class="coloring-container">
+    <div class="palette" id="palette"></div>
+    <canvas id="coloringCanvas"></canvas>
+</div>
+
+<script>
+
+// ==================== PALETTES ====================
+const palettes = {
+    "perroquet": [
+        { color: "#EC1C24", number: 1 },
+        { color: "#37B34A", number: 2 },
+        { color: "#FFF100", number: 3 },
+        { color: "#1B75BB", number: 4 },
+        { color: "#44C7F4", number: 5 }
+    ],
+    "oiseau": [
+        { color: "#B5E5EF", number: 1 },
+        { color: "#004F00", number: 2 },
+        { color: "#C6DD00", number: 3 },
+        { color: "#FFE6EF", number: 4 },
+		{ color: "#FF7CA4", number: 5 },
+		{ color: "#FFEEA4", number: 6 },
+		{ color: "#7C6593", number: 7 },
+		{ color: "#004194", number: 8 }
+    ],
+    "flamant": [
+        { color: "#FD575B", number: 1 },
+        { color: "#F08285", number: 2 },
+        { color: "#F7E2E1", number: 3 },
+        { color: "#F69850", number: 4 },
+        { color: "#DB8B44", number: 5 },
+        { color: "#70FAEA", number: 6 },
+        { color: "#6BBCF4", number: 7 },
+        { color: "#ADA2E7", number: 8 },
+        { color: "#FABFF5", number: 9 },
+		{ color: "#F0D667", number: 10 },
+        { color: "#F0EEBD", number: 11 },
+        { color: "#168B45", number: 12 },
+        { color: "#98D54C", number: 13 },
+        { color: "#D298FC", number: 14 },
+    ],
+    "test": [
+        { color: "#F72585", number: 1 },
+        { color: "#7209B7", number: 2 },
+        { color: "#3A0CA3", number: 3 },
+        { color: "#4361EE", number: 4 }
+    ]
+};
+
+// ==================== DESSIN CHOISI ====================
+function getDessineFromUrl() {
+    const params = new URLSearchParams(window.location.search);
+    return params.get("dessin") || "perroquet"; // fallback
+}
+const dessinChoisi = getDessineFromUrl();
+
+// ==================== IMAGES ====================
+let mainImg = new Image();
+mainImg.src = `images/${dessinChoisi}/image.png`;
+
+let maskImg = new Image();
+maskImg.src = `images/${dessinChoisi}/mask.png`;
+
+// ==================== PALETTE ====================
+const colors = palettes[dessinChoisi] || palettes["perroquet"];
+const paletteDiv = document.getElementById("palette");
+let currentColor = null;
+
+paletteDiv.innerHTML = ""; // reset au cas où
+
+colors.forEach(c => {
+    const swatch = document.createElement("div");
+    swatch.className = "color-swatch";
+    swatch.style.backgroundColor = c.color;
+    swatch.innerText = c.number;
+    swatch.onclick = () => {
+        currentColor = c.color;
+        document.querySelectorAll(".color-swatch").forEach(s => s.classList.remove("selected"));
+        swatch.classList.add("selected");
+    };
+    paletteDiv.appendChild(swatch);
+});
+
+// ==================== COLORIAGE ====================
+Promise.all([
+    new Promise(r => mainImg.onload = r),
+    new Promise(r => maskImg.onload = r)
+]).then(() => {
+    const canvas = document.getElementById("coloringCanvas");
+    const ctx = canvas.getContext("2d");
+
+    canvas.width = mainImg.width;
+    canvas.height = mainImg.height;
+    canvas.style.border = "2px solid black";
+
+    ctx.drawImage(mainImg, 0, 0, mainImg.width, mainImg.height);
+
+    const maskCanvas = document.createElement("canvas");
+    maskCanvas.width = maskImg.width;
+    maskCanvas.height = maskImg.height;
+    const maskCtx = maskCanvas.getContext("2d");
+    maskCtx.drawImage(maskImg, 0, 0, maskImg.width, maskImg.height);
+    const maskData = maskCtx.getImageData(0, 0, maskCanvas.width, maskCanvas.height);
+
+    const pixelColors = new Uint32Array(mainImg.width * mainImg.height);
+
+    canvas.addEventListener("click", e => {
+        if (!currentColor) return;
+        const rect = canvas.getBoundingClientRect();
+        const x = Math.floor((e.clientX - rect.left) * (canvas.width / rect.width));
+        const y = Math.floor((e.clientY - rect.top) * (canvas.height / rect.height));
+        const width = canvas.width;
+        const height = canvas.height;
+
+        const index = (y * width + x) * 4;
+        const r = maskData.data[index];
+        const g = maskData.data[index + 1];
+        const b = maskData.data[index + 2];
+
+        if (r === 255 && g === 255 && b === 255) return;
+
+        const imageData = ctx.getImageData(0, 0, width, height);
+        const fillRGB = hexToRgb(currentColor);
+
+        for (let j = 0; j < height; j++) {
+            for (let i = 0; i < width; i++) {
+                const idx = (j * width + i) * 4;
+                if (maskData.data[idx] === 0 && maskData.data[idx + 1] === 0 && maskData.data[idx + 2] === 0) continue;
+                if (maskData.data[idx] === r && maskData.data[idx + 1] === g && maskData.data[idx + 2] === b) {
+                    imageData.data[idx] = fillRGB.r;
+                    imageData.data[idx + 1] = fillRGB.g;
+                    imageData.data[idx + 2] = fillRGB.b;
+                    imageData.data[idx + 3] = 255;
+                    pixelColors[j * width + i] = (fillRGB.r << 16) | (fillRGB.g << 8) | fillRGB.b;
+                }
+            }
+        }
+
+        ctx.putImageData(imageData, 0, 0);
+    });
+
+    canvas.addEventListener("click", e => {
+        const rect = canvas.getBoundingClientRect();
+        const x = Math.floor((e.clientX - rect.left) * (canvas.width / rect.width));
+        const y = Math.floor((e.clientY - rect.top) * (canvas.height / rect.height));
+        const width = canvas.width;
+        const height = canvas.height;
+
+        const index = (y * width + x) * 4;
+        const r = maskData.data[index];
+        const g = maskData.data[index + 1];
+        const b = maskData.data[index + 2];
+
+        if (r === 255 && g === 255 && b === 255) return;
+
+        let count = 0;
+        for (let j = 0; j < height; j++) {
+            for (let i = 0; i < width; i++) {
+                const idx = (j * width + i) * 4;
+                if (maskData.data[idx] === r && maskData.data[idx + 1] === g && maskData.data[idx + 2] === b) count++;
+            }
+        }
+        console.log(`Pixel cliqué : rgb(${r},${g},${b}) → ${count} pixels dans cette zone.`);
+    });
+});
+
+// ==================== UTIL ====================
+function hexToRgb(hex) {
+    hex = hex.replace("#", "");
+    const bigint = parseInt(hex, 16);
+    return { r: (bigint >> 16) & 255, g: (bigint >> 8) & 255, b: bigint & 255 };
+}
+
+
+// ==================== BOUTON RETOUR ====================
+const changeDrawBtn = document.getElementById("changeDrawBtn");
+changeDrawBtn.onclick = () => {
+    window.location.href = "Galerie.html";
+};
+
+const goHomeBtn = document.getElementById("goHomeBtn");
+goHomeBtn.onclick = () => {
+    window.location.href = "../Accueil/Accueil.html";
+};
+
+// ==================== TRAÎNÉE ARC-EN-CIEL ====================
+const trailCanvas = document.createElement("canvas");
+trailCanvas.style.position = "fixed";
+trailCanvas.style.top = "0";
+trailCanvas.style.left = "0";
+trailCanvas.style.pointerEvents = "none";
+trailCanvas.style.zIndex = "9999";
+document.body.appendChild(trailCanvas);
+
+const ctx = trailCanvas.getContext("2d");
+let width = window.innerWidth;
+let height = window.innerHeight;
+trailCanvas.width = width;
+trailCanvas.height = height;
+
+window.addEventListener("resize", () => {
+    width = window.innerWidth;
+    height = window.innerHeight;
+    trailCanvas.width = width;
+    trailCanvas.height = height;
+});
+
+let mouseX = width / 2;
+let mouseY = height / 2;
+let lastMove = Date.now();
+
+document.addEventListener("mousemove", e => {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+    lastMove = Date.now();
+});
+
+const trail = [];
+const maxTrail = 10;
+
+function animateTrailCanvas() {
+    ctx.clearRect(0, 0, width, height);
+    trail.push({ x: mouseX, y: mouseY, time: Date.now() });
+    if (trail.length > maxTrail) trail.shift();
+
+    for (let i = 0; i < trail.length - 1; i++) {
+        const p = trail[i];
+        const next = trail[i + 1];
+        const alpha = 0.8 * (1 - i / trail.length);
+
+        const hue = (i * 30 + Date.now() / 10) % 360;
+        ctx.strokeStyle = `hsla(${hue},100%,60%,${alpha})`;
+        ctx.lineWidth = 6 * alpha;
+
+        ctx.shadowBlur = 8;
+        ctx.shadowColor = ctx.strokeStyle;
+
+        ctx.beginPath();
+        ctx.moveTo(p.x, p.y);
+        ctx.lineTo(next.x, next.y);
+        ctx.stroke();
+    }
+
+    if (Date.now() - lastMove > 300) trail.length = 0;
+
+    requestAnimationFrame(animateTrailCanvas);
+}
+
+animateTrailCanvas();
+</script>
+
+</body>
+</html>
