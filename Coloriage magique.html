@@ -147,6 +147,11 @@ Promise.all([
 			for (let i = 0; i < width; i++) {
 				const idx = (j * width + i) * 4;
 
+				// Ignore les pixels noirs (contours)
+				if (maskData.data[idx] === 0 && maskData.data[idx + 1] === 0 && maskData.data[idx + 2] === 0) {
+					continue;
+				}
+
 				if (maskData.data[idx] === r &&
 					maskData.data[idx + 1] === g &&
 					maskData.data[idx + 2] === b) {
