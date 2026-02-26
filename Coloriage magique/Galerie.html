@@ -84,6 +84,17 @@ dessins.forEach(name => {
     gallery.appendChild(card);
 });
 
+document.querySelectorAll(".card img").forEach(img => {
+
+    const dessinId = img.dataset.dessin;
+    const saved = localStorage.getItem("coloriage_" + dessinId);
+
+    if (saved) {
+        img.src = saved;
+    }
+
+});
+
 // TRAÎNÉE ARC-EN-CIEL FLUIDE LÉGÈRE
 const trailCanvas = document.createElement("canvas");
 trailCanvas.style.position = "fixed";
@@ -159,3 +170,4 @@ animateTrailCanvas();
 
 </body>
 </html>
+
