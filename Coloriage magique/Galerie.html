@@ -104,7 +104,7 @@ trailCanvas.style.pointerEvents = "none";
 trailCanvas.style.zIndex = "9999";
 document.body.appendChild(trailCanvas);
 
-const ctx = trailCanvas.getContext("2d");
+const trailCtx = trailCanvas.getContext("2d");
 let width = window.innerWidth;
 let height = window.innerHeight;
 trailCanvas.width = width;
@@ -131,7 +131,7 @@ const trail = [];
 const maxTrail = 10; // moins de points => traînée plus courte
 
 function animateTrailCanvas() {
-    ctx.clearRect(0,0,width,height);
+    trailCtx .clearRect(0,0,width,height);
 
     // ajoute la nouvelle position
     trail.push({x: mouseX, y: mouseY, time: Date.now()});
@@ -143,17 +143,17 @@ function animateTrailCanvas() {
         const alpha = 0.8 * (1 - i / trail.length); // plus subtil
 
         const hue = (i*30 + Date.now()/10)%360;
-        ctx.strokeStyle = `hsla(${hue},100%,60%,${alpha})`;
-        ctx.lineWidth = 6*(alpha); 
+        trailCtx .strokeStyle = `hsla(${hue},100%,60%,${alpha})`;
+        trailCtx .lineWidth = 6*(alpha); 
 
         // effet de flou léger
-        ctx.shadowBlur = 8;
-        ctx.shadowColor = ctx.strokeStyle;
+        trailCtx .shadowBlur = 8;
+        trailCtx .shadowColor = trailCtx .strokeStyle;
 
-        ctx.beginPath();
-        ctx.moveTo(p.x, p.y);
-        ctx.lineTo(next.x, next.y);
-        ctx.stroke();
+        trailCtx .beginPath();
+        trailCtx .moveTo(p.x, p.y);
+        trailCtx .lineTo(next.x, next.y);
+        trailCtx .stroke();
     }
 
     // efface si souris immobile > 300ms
@@ -170,4 +170,5 @@ animateTrailCanvas();
 
 </body>
 </html>
+
 
