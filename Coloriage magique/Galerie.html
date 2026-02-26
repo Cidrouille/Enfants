@@ -73,8 +73,13 @@ dessins.forEach(name => {
     const card = document.createElement("div");
     card.className = "card";
 
-    card.innerHTML =
-        `<img src="images/${name}/image.png">`;
+    const saved = localStorage.getItem("coloriage_" + name);
+
+	const imgSrc = saved
+	    ? saved
+	    : `images/${name}/image.png`;
+	
+	card.innerHTML = `<img src="${imgSrc}">`;
 
     card.onclick = () => {
         window.location.href =
@@ -159,3 +164,4 @@ animateTrailCanvas();
 
 </body>
 </html>
+
