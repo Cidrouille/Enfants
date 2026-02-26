@@ -263,10 +263,7 @@ goHomeBtn.onclick = () => {
 };
 
 // ==================== RESET DESSIN ====================
-const resetBtn = document.createElement("button");
-resetBtn.textContent = "Réinitialiser";
-
-document.querySelector(".header-left").appendChild(resetBtn);
+const resetBtn = document.getElementById("resetBtn");
 
 resetBtn.onclick = () => {
     if (confirm("Réinitialiser ce coloriage ?")) {
@@ -343,6 +340,7 @@ animateTrailCanvas();
 
 </body>
 </html>
+
 
 
 
