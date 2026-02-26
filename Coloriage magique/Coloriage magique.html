@@ -63,9 +63,6 @@
 
 <script>
 
-let canvas;
-let ctx;
-
 // ==================== PALETTES ====================
 const palettes = {
     "perroquet": [
@@ -144,15 +141,14 @@ Promise.all([
     new Promise(r => mainImg.onload = r),
     new Promise(r => maskImg.onload = r)
 ]).then(() => {
-    canvas = document.getElementById("coloringCanvas");
-	ctx = canvas.getContext("2d");
+    const canvas = document.getElementById("coloringCanvas");
+    const ctx = canvas.getContext("2d");
 
     canvas.width = mainImg.width;
     canvas.height = mainImg.height;
     canvas.style.border = "2px solid black";
 
     ctx.drawImage(mainImg, 0, 0, mainImg.width, mainImg.height);
-	loadDrawingIfExists(canvas, ctx);
 
     const maskCanvas = document.createElement("canvas");
     maskCanvas.width = maskImg.width;
@@ -220,41 +216,8 @@ Promise.all([
             }
         }
         console.log(`Pixel cliqué : rgb(${r},${g},${b}) → ${count} pixels dans cette zone.`);
-
-		saveDrawing();
     });
 });
-
-// ==================== SAUVEGARDE ==================
-
-function saveDrawing() {
-
-    const dessinId = new URLSearchParams(window.location.search).get("dessin");
-
-    if (!dessinId) return;
-
-    const dataURL = canvas.toDataURL("image/png");
-
-    localStorage.setItem("coloriage_" + dessinId, dataURL);
-}
-
-function loadDrawingIfExists(canvas, ctx) {
-
-    const dessinId = new URLSearchParams(window.location.search).get("dessin");
-    if (!dessinId) return;
-
-    const saved = localStorage.getItem("coloriage_" + dessinId);
-    if (!saved) return;
-
-    const img = new Image();
-
-    img.onload = () => {
-        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-    };
-
-    img.src = saved;
-}
-	
 
 // ==================== UTIL ====================
 function hexToRgb(hex) {
@@ -343,4 +306,3 @@ animateTrailCanvas();
 
 </body>
 </html>
-
