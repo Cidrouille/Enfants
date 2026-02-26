@@ -259,6 +259,19 @@ goHomeBtn.onclick = () => {
     window.location.href = "../Accueil/Accueil.html";
 };
 
+// ==================== RESET DESSIN ====================
+const resetBtn = document.createElement("button");
+resetBtn.textContent = "Réinitialiser";
+
+document.querySelector(".header-left").appendChild(resetBtn);
+
+resetBtn.onclick = () => {
+    if (confirm("Réinitialiser ce coloriage ?")) {
+        localStorage.removeItem("coloriage_" + dessinChoisi);
+        location.reload();
+    }
+};
+
 // ==================== TRAÎNÉE ARC-EN-CIEL ====================
 const trailCanvas = document.createElement("canvas");
 trailCanvas.style.position = "fixed";
@@ -327,4 +340,5 @@ animateTrailCanvas();
 
 </body>
 </html>
+
 
