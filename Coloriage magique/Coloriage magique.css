@@ -50,7 +50,7 @@ header {
 
 .header-right {
   position: absolute;
-  top: 40px;
+  top: 60px;
   right: 200px;
   display: flex;
   flex-direction: column;
@@ -299,5 +299,6 @@ header {
   box-shadow: 0 0 15px #ffd700, 0 0 30px #ffff66;
   z-index: 10;
 }
+
 
 
