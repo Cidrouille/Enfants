@@ -48,7 +48,18 @@ header {
   z-index: 10;
 }
 
-.header-left button {
+.header-right {
+  position: absolute;
+  top: 40px;
+  right: 200px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 220px;
+  z-index: 10;
+}
+
+.header-left button, .header-right button {
   padding: 12px 30px;
   min-width: 225px;
   border: none;
@@ -60,7 +71,7 @@ header {
   transition: transform 0.3s;
 }
 
-.header-left button:hover {
+.header-left button:hover, .header-right button:hover {
     transform: scale(1.1);
 }
 
@@ -288,4 +299,5 @@ header {
   box-shadow: 0 0 15px #ffd700, 0 0 30px #ffff66;
   z-index: 10;
 }
+
 
