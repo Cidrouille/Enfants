@@ -61,7 +61,7 @@ header {
 
 .header-left button {
   padding: 12px 30px;
-  min-width: 160px;      /* force une largeur identique */
+  min-width: 250px;      /* force une largeur identique */
   border: none;
   border-radius: 30px;
   font-size: 18px;        /* taille uniforme */
@@ -416,4 +416,5 @@ main {
   box-shadow: 0 0 15px #ffd700, 0 0 30px #ffff66;
   z-index: 10;
 }
+
 
