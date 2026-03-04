@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Mémoire sonore</title>
+<link rel="stylesheet" href="Memoire sonore.css">
+</head>
+<body>
+
+<div class="background">
+    <!-- Bulles, lumières, étoiles et lunes inchangées -->
+    <span class="bubble" style="--size:30px; --left:10%; --duration:12s;"></span>
+    <span class="bubble" style="--size:50px; --left:70%; --duration:15s;"></span>
+    <span class="bubble" style="--size:40px; --left:40%; --duration:18s;"></span>
+    <span class="bubble" style="--size:25px; --left:80%; --duration:10s;"></span>
+
+    <span class="lights" style="--size:12px; --left:15%; --duration:8s;"></span>
+    <span class="lights" style="--size:10px; --left:45%; --duration:10s;"></span>
+    <span class="lights" style="--size:14px; --left:70%; --duration:12s;"></span>
+	
+	<span class="star" style="--size:18px; --left:15%; --duration:12s;"></span>
+    <span class="star" style="--size:12px; --left:45%; --duration:8s;"></span>
+	<span class="star" style="--size:25px; --left:85%; --duration:10s;"></span>
+	
+	<span class="lune" style="--size:18px; --left:20%; --duration:10s;"></span>
+    <span class="lune" style="--size:12px; --left:50%; --duration:15s;"></span>
+	<span class="lune" style="--size:25px; --left:90%; --duration:13s;"></span>
+	
+	<div class="shooting-star" style="--size:25px; --duration:5s; --start-left:0vw; --start-bottom:65%;">
+	  <div class="trail"></div>
+	  <div class="star-shape"></div>
+	</div>
+	<div class="shooting-star" style="--size:25px; --duration:6s; --start-left:0vw; --start-bottom:10%;">
+	  <div class="trail"></div>
+	  <div class="star-shape"></div>
+	</div>
+	<div class="shooting-star" style="--size:25px; --duration:7s; --start-left:50vw; --start-bottom:0%;">
+	  <div class="trail"></div>
+	  <div class="star-shape"></div>
+	</div>
+	
+	<div id="cursor-trail"></div>
+</div>
+
+<header>
+    <div class="header-left">
+        <button id="goHomeBtn">Changer de jeu</button>
+		<button id="changeInstrumentBtn" style="display:none;">Changer d'instrument</button>
+    </div>
+    <h1>
+	  <span class="emoji">🎶</span>
+      <span class="title-text">Mémoire sonore</span>
+	</h1>
+</header>
+
+<!-- Sélection de la difficulté -->
+<div class="difficulty" style="display:none;">
+    <button class="diff-btn" data-diff="1">1 note</button>
+    <button class="diff-btn" data-diff="2">2 notes</button>
+    <button class="diff-btn" data-diff="3">3 notes</button>
+    <button class="diff-btn" data-diff="infini">Infini</button>
+</div>
+
+<main>
+	<div id="themeMenu">
+        <div class="theme-card" data-theme="piano">
+            <span>🎹</span><p>Piano</p>
+        </div>
+        <div class="theme-card" data-theme="trompette">
+            <span>🎺</span><p>Trompette</p>
+        </div>
+        <div class="theme-card" data-theme="guitare">
+            <span>🎸</span><p>Guitare</p>
+		</div>
+    </div>
+	
+	<!-- Conteneurs séparés pour les instruments -->
+	<div id="instrumentsContainer">
+        <div id="pianoContainer" class="instrument" style="display:none;"></div>
+        <div id="trompetteContainer" class="instrument" style="display:none; position:relative; text-align:center;">
+			<img id="trompetteImg" src="images/trompette.png" alt="Trompette" style="max-width:800px; width:80%; margin-left:-80px; height:auto;">
+		</div>
+        <div id="guitareContainer" class="instrument" style="display:none;"></div>
+    </div>
+
+	<p id="message"></p>
+
+	<div id="gameArea" style="display:none;">
+        <button id="startGameBtn" class="diff-btn">
+            ▶ Lancer la partie
+		</button>
+        <button id="nextBtn" class="replay-btn">Rejouer la séquence</button>
+    </div>
+</main>
+
+<script>
+const instruments = {
+    piano: [
+        {note:'C', color:'white', sound:'sounds/piano/C4.mp3'},
+		{note:'C#', color:'black', sound:'sounds/piano/Cs4.mp3'},
+		{note:'D', color:'white', sound:'sounds/piano/D4.mp3'},
+		{note:'D#', color:'black', sound:'sounds/piano/Ds4.mp3'},
+		{note:'E', color:'white', sound:'sounds/piano/E4.mp3'},
+		{note:'F', color:'white', sound:'sounds/piano/F4.mp3'},
+		{note:'F#', color:'black', sound:'sounds/piano/Fs4.mp3'},
+		{note:'G', color:'white', sound:'sounds/piano/G4.mp3'},
+		{note:'G#', color:'black', sound:'sounds/piano/Gs4.mp3'},
+		{note:'A', color:'white', sound:'sounds/piano/A4.mp3'},
+		{note:'A#', color:'black', sound:'sounds/piano/As4.mp3'},
+		{note:'B', color:'white', sound:'sounds/piano/B4.mp3'}
+    ],
+    trompette: [
+        {note:'C', color:'gold', sound:'sounds/trompette/trumpet_C.mp3'},
+        {note:'D', color:'gold', sound:'sounds/trompette/trumpet_D.mp3'},
+        {note:'E', color:'gold', sound:'sounds/trompette/trumpet_E.mp3'},
+		{note:'F', color:'gold', sound:'sounds/trompette/trumpet_F.mp3'}
+    ],
+    guitare: [
+        {note:'C', color:'saddlebrown', sound:'sounds/guitar_C.mp3'},
+        {note:'D', color:'saddlebrown', sound:'sounds/guitar_D.mp3'},
+        {note:'E', color:'saddlebrown', sound:'sounds/guitar_E.mp3'}
+    ]
+};
+
+let currentInstrument = '';
+let sequence = [];
+let playerSequence = [];
+let difficulty = 1;
+let isPlaying = false;
+let gameStarted = false;
+let currentAudio = null; // 🎵 son en cours
+
+// ==========================
+// RENDU INSTRUMENTS INDÉPENDANTS
+// ==========================
+function renderInstrument(name){
+    const container = document.getElementById(name + 'Container');
+
+    // ⚠️ Ne pas vider le container si c'est la trompette (on garde l'image)
+    if(name !== 'trompette') container.innerHTML = '';
+
+    container.style.display = 'flex';
+    container.style.position = (name==='piano') ? 'relative' : 'relative'; // trompette aussi relative pour position absolue des boutons
+    container.style.justifyContent = 'center';
+    container.style.margin = '20px 0';
+
+    instruments[name].forEach(key=>{
+        const btn = document.createElement('button');
+        btn.className = 'key '+key.color;
+        btn.dataset.note = key.note;
+        btn.dataset.sound = key.sound;
+        btn.textContent = (name==='piano') ? '' : key.note;
+
+        // ⚡ Pour trompette seulement : position absolue sur l'image
+        if(name === 'trompette'){
+			btn.style.position = 'absolute';
+
+			// positions approximatives
+			if(key.note === 'C') { btn.style.left = '42.8%'; btn.style.top = '9%'; }
+			if(key.note === 'D') { btn.style.left = '46.6%'; btn.style.top = '9%'; }
+			if(key.note === 'E') { btn.style.left = '50.5%'; btn.style.top = '9%'; }
+			if(key.note === 'F') { btn.style.left = '54.5%'; btn.style.top = '9%'; }
+
+			btn.style.width = '25px';
+			btn.style.height = '50px';
+
+			const noteImg = document.createElement('img');
+			noteImg.src = `images/trompette${key.note}.png`;
+			noteImg.className = 'trompette-note';
+			noteImg.dataset.note = key.note;
+			container.appendChild(noteImg);
+		}
+
+        container.appendChild(btn);
+    });
+
+    // Affiche uniquement le conteneur choisi
+    document.querySelectorAll('.instrument').forEach(c=>{
+        c.style.display = (c.id===name+'Container') ? 'flex' : 'none';
+    });
+}
+
+// ==========================
+// STOP PARTIE
+// ==========================
+function stopGame(){
+
+    // stop lecture
+    isPlaying = false;
+
+    // reset données
+    sequence = [];
+    playerSequence = [];
+    gameStarted = false;
+
+    // message vide
+    document.getElementById('message').textContent = '';
+
+    // réaffiche bouton start
+    document.getElementById('startGameBtn').style.display = "inline-block";
+}
+
+// ==========================
+// RESET PARTIE
+// ==========================
+function resetGame(){
+    sequence = [];
+    playerSequence = [];
+
+    updateDifficultyButtons(); // ← garde la sélection visible
+
+    if(!gameStarted) return;
+
+    addNote();
+    playSequence();
+}
+
+// ==========================
+// AJOUT NOTE ALEATOIRE
+// ==========================
+function addNote(){
+    const keys = instruments[currentInstrument];
+    const note = keys[Math.floor(Math.random()*keys.length)];
+    sequence.push(note.note);
+}
+
+// ==========================
+// JOUER SEQUENCE
+// ==========================
+async function playSequence(){
+    if(isPlaying) return;
+    isPlaying = true;
+    const keys = document.querySelectorAll(`#${currentInstrument}Container .key`);
+    for(const note of sequence){
+		if(!isPlaying) break;
+        const keyBtn = Array.from(keys).find(k=>k.dataset.note===note);
+        if(!keyBtn) continue;
+        keyBtn.classList.add('active');
+		
+		if(currentInstrument === 'trompette'){
+
+			const mainImg = document.getElementById("trompetteImg");
+			const img = document.querySelector(
+				`#${currentInstrument}Container .trompette-note[data-note="${note}"]`
+			);
+
+			if(mainImg) mainImg.style.visibility = "hidden"; // cache trompette principale
+
+			if(img){
+				img.style.display = 'block';
+
+				setTimeout(() => {
+					img.style.display = 'none';
+					if(mainImg) mainImg.style.visibility = "visible"; // réaffiche
+				}, 500);
+			}
+		}
+			
+        new Audio(keyBtn.dataset.sound).play();
+        await new Promise(r=>setTimeout(r,500));
+        keyBtn.classList.remove('active');
+        await new Promise(r=>setTimeout(r,500));
+    }
+    isPlaying = false;
+    playerSequence = [];
+}
+
+// ==========================
+// TOUR JOUEUR
+// ==========================
+document.querySelectorAll('.instrument').forEach(container=>{
+    container.addEventListener('click', e=>{
+        if(!gameStarted) return;
+        if(!e.target.classList.contains('key')) return;
+        if(isPlaying) return;
+        const note = e.target.dataset.note;
+        new Audio(e.target.dataset.sound).play();
+        e.target.classList.add('active');
+        setTimeout(()=> e.target.classList.remove('active'),300);
+		
+		// image trompette en fonction de la touche
+		const mainImg = document.getElementById("trompetteImg");
+		const img = document.querySelector(
+			`#${currentInstrument}Container .trompette-note[data-note="${note}"]`
+		);
+
+		if(mainImg) mainImg.style.visibility = "hidden";
+
+		if(img){
+			img.style.display = 'block';
+
+			setTimeout(() => {
+				img.style.display = 'none';
+				if(mainImg) mainImg.style.visibility = "visible";
+			}, 500);
+		}
+		
+        playerSequence.push(note);
+        const idx = playerSequence.length-1;
+        if(playerSequence[idx] !== sequence[idx]){
+            document.getElementById('message').textContent = '❌ Perdu !';
+            setTimeout(()=>{
+                document.getElementById('message').textContent = '';
+                resetGame();
+            },1500);
+            return;
+        }
+        if(playerSequence.length === sequence.length){
+            document.getElementById('message').textContent = '✅ Bien !';
+            setTimeout(()=>document.getElementById('message').textContent='',800);
+            if(difficulty === 'infini'){
+                addNote();
+            } else if(sequence.length < parseInt(difficulty)){
+                addNote();
+            } else{
+                sequence = [];
+                for(let i=0;i<parseInt(difficulty);i++) addNote();
+            }
+            setTimeout(playSequence,1000);
+        }
+    });
+});
+
+// ==========================
+// CHOIX DIFFICULTE
+// ==========================
+document.querySelectorAll('.diff-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+
+        if(btn.id === "startGameBtn") return;
+
+        // UI sélection
+        document.querySelectorAll('.difficulty .diff-btn')
+            .forEach(b => b.classList.remove('selected'));
+
+        btn.classList.add('selected');
+
+        difficulty = btn.dataset.diff;
+
+        // 🔴 arrêter la partie en cours
+        stopGame();
+    });
+});
+
+function updateDifficultyButtons() {
+    document.querySelectorAll('.diff-btn').forEach(b => b.classList.remove('selected'));
+    const btn = document.querySelector(`.diff-btn[data-diff="${difficulty}"]`);
+    if(btn) btn.classList.add('selected');
+}
+
+// ==========================
+// CHOIX INSTRUMENT
+// ==========================
+document.querySelectorAll('.theme-card').forEach(card=>{
+    card.addEventListener('click', ()=>{
+        currentInstrument = card.dataset.theme;
+        document.getElementById('themeMenu').style.display = 'none';
+        document.getElementById('gameArea').style.display = 'block';
+		document.getElementById('changeInstrumentBtn').style.display = "inline-block";
+        renderInstrument(currentInstrument);
+        document.querySelector('.difficulty').style.display = 'flex';
+        difficulty = 1;
+        gameStarted = false;
+        document.querySelectorAll('.diff-btn').forEach(b=>b.classList.remove('selected'));
+        document.querySelector('.diff-btn[data-diff="1"]').classList.add('selected');
+        sequence = [];
+        playerSequence = [];
+        document.getElementById('startGameBtn').style.display = "inline-block";
+    });
+});
+
+// ==========================
+// BOUTON LANCER PARTIE
+// ==========================
+document.getElementById('startGameBtn').addEventListener('click', ()=>{
+    gameStarted = true;
+    document.getElementById('startGameBtn').style.display = "none";
+    resetGame();
+});
+
+// ==========================
+// REJOUER SEQUENCE
+// ==========================
+document.getElementById('nextBtn').addEventListener('click', () => {
+    updateDifficultyButtons();
+    playSequence();
+});
+
+// ==========================
+// RETOUR MENU
+// ==========================
+goHomeBtn.onclick = ()=>{
+	stopGame();
+    window.location.href = "../Accueil/Accueil.html";
+};
+
+changeInstrumentBtn.onclick = () => {
+	stopGame();
+    // cacher zone jeu
+    document.getElementById("gameArea").style.display = "none";
+
+    // afficher menu instruments
+    document.getElementById("themeMenu").style.display = "flex";
+
+    // ✅ cacher TOUS les instruments
+    document.querySelectorAll('.instrument').forEach(inst=>{
+        inst.style.display = "none";
+    });
+
+    // cacher difficultés
+    document.querySelector('.difficulty').style.display = "none";
+
+    // cacher bouton changer instrument
+    changeInstrumentBtn.style.display = "none";
+
+    // reset état jeu
+    gameStarted = false;
+    sequence = [];
+    playerSequence = [];
+
+    // fond initial
+    document.body.style.background =
+        "linear-gradient(135deg,#5FE0EE,#0DC5DD,#0A97A9)";
+};
+
+// ==========================
+// TRAÎNÉE ARC-EN-CIEL (inchangé)
+// ==========================
+const trailCanvas = document.createElement("canvas");
+trailCanvas.style.position = "fixed";
+trailCanvas.style.top = "0";
+trailCanvas.style.left = "0";
+trailCanvas.style.pointerEvents = "none";
+trailCanvas.style.zIndex = "9999";
+document.body.appendChild(trailCanvas);
+
+const ctx = trailCanvas.getContext("2d");
+let width = window.innerWidth;
+let height = window.innerHeight;
+trailCanvas.width = width;
+trailCanvas.height = height;
+
+window.addEventListener("resize", () => {
+    width = window.innerWidth;
+    height = window.innerHeight;
+    trailCanvas.width = width;
+    trailCanvas.height = height;
+});
+
+let mouseX = width/2;
+let mouseY = height/2;
+let lastMove = Date.now();
+
+document.addEventListener("mousemove", e => {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+    lastMove = Date.now();
+});
+
+const trail = [];
+const maxTrail = 10;
+
+function animateTrailCanvas() {
+    ctx.clearRect(0,0,width,height);
+    trail.push({x: mouseX, y: mouseY, time: Date.now()});
+    if(trail.length > maxTrail) trail.shift();
+    for(let i=0; i<trail.length-1; i++){
+        const p = trail[i];
+        const next = trail[i+1];
+        const alpha = 0.8 * (1 - i / trail.length);
+        const hue = (i*30 + Date.now()/10)%360;
+        ctx.strokeStyle = `hsla(${hue},100%,60%,${alpha})`;
+        ctx.lineWidth = 6*(alpha);
+        ctx.shadowBlur = 8;
+        ctx.shadowColor = ctx.strokeStyle;
+        ctx.beginPath();
+        ctx.moveTo(p.x, p.y);
+        ctx.lineTo(next.x, next.y);
+        ctx.stroke();
+    }
+    if(Date.now() - lastMove > 300) trail.length = 0;
+    requestAnimationFrame(animateTrailCanvas);
+}
+animateTrailCanvas();
+</script>
+
+</body>
+</html>
