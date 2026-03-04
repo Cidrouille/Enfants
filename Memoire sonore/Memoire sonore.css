@@ -161,6 +161,7 @@ main {
     background: #fff;
     border: 1px solid #000;
     z-index: 1;
+	cursor: url('images/curseur2.png'), auto;
 }
 
 /* touches noires */
@@ -171,6 +172,7 @@ main {
     position: absolute;
     top: 0;
     z-index: 2;
+	cursor: url('images/curseur2.png'), auto;
 }
 
 /* Position des noires */
@@ -218,6 +220,7 @@ main {
     height: 25px;
     z-index: 4;
     font-size: 0;
+	cursor: url('images/curseur2.png'), auto;
 
     border-radius: 50%; /* ← transforme en ovale */
 }
