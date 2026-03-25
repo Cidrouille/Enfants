@@ -20,7 +20,7 @@ a:hover, button:hover {
     cursor: url('images/curseur2.png'), auto;
 }
 
-#goHomeBtn:hover, .theme-card:hover {
+#goHomeBtn:hover, .theme-card:hover, #changeThemeBtn:hover {
     cursor: url('images/curseur2.png'), auto;
 }
 
