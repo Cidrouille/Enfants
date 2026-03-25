@@ -1,0 +1,389 @@
+/* ========================= */
+/* BASE */
+/* ========================= */
+
+@font-face {
+    font-family: "CursiveEcole";
+    src: url("fonts/Cursive standard.ttf");
+}
+
+body{
+    margin:0;
+    font-family:Arial, sans-serif;
+    background: linear-gradient(135deg,#E6B8EC, #D090DA, #A85BB5);
+    min-height:100vh;
+    overflow:hidden;
+}
+
+/* Curseur par défaut sur tout le corps */
+body, a, button {
+    cursor: url('images/curseur.png'), auto; /* centre du curseur */
+}
+
+/* Facultatif : si tu veux que le curseur reste la main même sur hover ou éléments spéciaux */
+a:hover, button:hover {
+    cursor: url('images/curseur2.png'), auto;
+}
+
+#goHomeBtn:hover, #changeThemeBtn:hover, .theme-card:hover {
+    cursor: url('images/curseur2.png'), auto;
+}
+
+/* PARTICULES DE LA TRAÎNÉE */
+cursor-trail {
+    position: fixed;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: conic-gradient(red, orange, yellow, green, blue, indigo, violet);
+    pointer-events: none;
+    filter: blur(3px);
+    transition: transform 0.1s;
+    z-index: 9999;
+}
+
+
+/* HEADER */
+header {
+  background: linear-gradient(45deg,#ff9a76,#ffdac1);
+  padding: 70px;
+  border-bottom-left-radius: 40px;
+  border-bottom-right-radius: 40px;
+  color:white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.title-text {
+  font-size: 1em;
+  font-weight: bold;
+  background: linear-gradient(90deg, #D090DA, #A85BB5);
+  -webkit-background-clip: text; /* clip le fond sur le texte */
+  -webkit-text-fill-color: transparent; /* rend le texte transparent pour voir le gradient */
+}
+
+.header-left {
+  position: absolute;
+  top: 40px;
+  left: 200px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 220px;  /* largeur fixe du conteneur */
+}
+
+.header-left button {
+  padding: 12px 30px;
+  min-width: 160px;      /* force une largeur identique */
+  border: none;
+  border-radius: 30px;
+  font-size: 18px;        /* taille uniforme */
+  font-weight: bold;
+  background: linear-gradient(45deg,#70e1f5,#a1f7ff);
+  color: black;
+  cursor: pointer;
+  transition: transform 0.3s;
+  text-align: center;     /* assure que le texte reste centré */
+}
+
+.header-left button:hover { transform: scale(1.1); }
+
+header h1 {
+  font-size: 2em;
+  font-weight: bold;
+  margin: 0;
+}
+
+button{
+    padding:10px 15px;
+    border:none;
+    border-radius:8px;
+    cursor:pointer;
+    background:linear-gradient(45deg,#ffffff,#f1f3f5);
+    font-weight:bold;
+    transition:0.2s;
+}
+
+button:hover{
+    transform:scale(1.05);
+}
+
+#themeMenu {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 30px;
+
+  width: 100%;
+  min-height: 60vh; /* centre verticalement */
+  flex-direction: row;
+}
+
+.theme-card {
+  background: linear-gradient(135deg,#fff5b7,#ffcc80);
+  width: 150px;
+  height: 150px;
+  border-radius: 30px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  font-size: 1.2em;
+  font-weight: bold;
+  box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+  transition: transform 0.3s, box-shadow 0.3s;
+  position: relative;
+  z-index: 2;
+  
+}
+.theme-card span { font-size: 3em; }
+.theme-card:hover { transform: scale(1.1); box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
+
+/* JEU */
+.game-container {
+    margin-top: 60px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+	z-index: 10; /* au-dessus du background */
+}
+
+/* CANVAS */
+.canvas-wrapper {
+    position: relative;
+    width: 400px;
+    height: 400px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+	z-index: 10;
+}
+
+#modele {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 180px;
+    color: rgba(0,0,0,0.1);
+    pointer-events: none;
+    margin: 0;
+	font-family: 'CursiveEcole', cursive;
+}
+
+#writeCanvas {
+    border: 3px dashed white;
+    border-radius: 20px;
+    background: rgba(255,255,255,0.15);
+	z-index: 20; /* encore au-dessus */
+}
+
+/* Canvas de la traînée → aucun style */
+canvas:not(#writeCanvas) {
+    border: none !important;
+    background: transparent !important;
+    outline: none !important;
+}
+
+#trailCanvas {
+    border: none !important;
+    background: transparent !important;
+    outline: none !important;
+}
+
+/* BOUTONS */
+.buttons {
+    margin-top: 20px;
+    display: flex;
+    gap: 10px;
+}
+
+button {
+    padding: 10px 15px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+/* RESULTAT */
+#result {
+    margin-top: 15px;
+    font-size: 24px;
+    color: white;
+}
+
+
+
+.background {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    z-index: 0;            /* fond derrière tout le contenu */
+    pointer-events: none;  /* clics passent à travers */
+}
+
+/* ========================= */
+/* BACKGROUND ANIMATION */
+/* ========================= */
+
+/* Animation */
+@keyframes bubble {
+  from { transform: translateY(0);}
+  to { transform: translateY(-110vh);}
+}
+
+@keyframes lights {
+  0%{opacity:0.4;transform:scale(1);}
+  50%{opacity:1;transform:scale(1.5);}
+  100%{opacity:0.4;transform:scale(1);}
+}
+
+@keyframes star {
+    from{transform:translateY(0);}
+    to{transform:translateY(-120vh);}
+}
+
+@keyframes shoot-diagonal {
+  0% {
+    transform: translate(0,0);
+  }
+  100% {
+    transform: translate(120vw, -100vh); /* diagonale vers haut-gauche */
+  }
+}
+
+/* Tous les éléments du fond */
+.bubble, .star, .lune, .lights, .shooting-star, .trail, .star-shape {
+    z-index: 0;           /* s'assure qu'ils restent derrière */
+}
+
+
+/* Lights */
+.lights {
+  position: absolute;
+  top:0;
+  width: var(--size);
+  height: var(--size);
+  background: #fffacd;
+  border-radius: 50%;
+  box-shadow:0 0 12px #fffacd;
+  left: var(--left);
+  animation: lights var(--duration) infinite alternate;
+}
+
+/* Bulles */
+.bubble {
+  position: absolute;
+  bottom:-50px;
+  width: var(--size);
+  height: var(--size);
+  background: rgba(255,255,255,0.3);
+  border-radius: 50%;
+  left: var(--left);
+  animation: bubble var(--duration) infinite linear;
+}
+  
+.star{
+	position:absolute;
+	bottom:-100px;
+	left:var(--left);
+	width:var(--size);
+	height:var(--size);
+	animation: star var(--duration) linear infinite;
+}
+
+/* Etoiles */
+.star{
+    background:yellow;
+    clip-path:polygon(
+        50% 0%,
+        61% 35%,
+        98% 35%,
+        68% 57%,
+        79% 91%,
+        50% 70%,
+        21% 91%,
+        32% 57%,
+        2% 35%,
+        39% 35%
+    );
+}
+
+/* Lunes */
+.lune {
+  position: absolute;
+  bottom: -100px;
+  left: var(--left);
+  width: var(--size);
+  height: var(--size);
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #fffacd, #f4e04d);
+  box-shadow: 0 0 20px #fffacd;
+  animation: bubble var(--duration) linear infinite;
+}
+
+/* Conteneur qui bouge */
+.shooting-star {
+  position: absolute;
+  bottom: var(--start-bottom, 0%);   /* hauteur de départ */
+  left: var(--start-left, 100vw);    /* départ hors écran à droite */
+  width: 250px;                      /* espace pour la traînée */
+  height: 30px;
+  animation: shoot-diagonal var(--duration) linear infinite;
+  z-index: 10;
+}
+
+/* Traînée inclinée */
+.trail {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  width: 150px;
+  height: 6px;
+
+  background: linear-gradient(
+    to left,
+    rgba(255,255,255,0.8),
+    rgba(255,255,255,0.4),
+    rgba(255,255,255,0)
+  );
+
+  filter: blur(4px);
+  z-index: 5;
+
+  transform: translateY(-50%) rotate(-25deg); /* inclinaison diagonale */
+  transform-origin: right center; /* pivot sur le bord droit (étoile) */
+}
+
+/* Étoile */
+.star-shape {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 25px;
+  height: 25px;
+  
+  background: #fcf112;
+  clip-path: polygon(
+      50% 0%,
+      61% 35%,
+      98% 35%,
+      68% 57%,
+      79% 91%,
+      50% 70%,
+      21% 91%,
+      32% 57%,
+      2% 35%,
+      39% 35%
+  );
+  box-shadow: 0 0 15px #ffd700, 0 0 30px #ffff66;
+  z-index: 10;
+}
+

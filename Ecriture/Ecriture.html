@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Ecriture</title>
+<link rel="stylesheet" href="Ecriture.css">
+</head>
+
+<body>
+
+<div class="background">
+     <!-- Bulles -->
+    <span class="bubble" style="--size:30px; --left:10%; --duration:12s;"></span>
+    <span class="bubble" style="--size:50px; --left:70%; --duration:15s;"></span>
+    <span class="bubble" style="--size:40px; --left:40%; --duration:18s;"></span>
+    <span class="bubble" style="--size:25px; --left:80%; --duration:10s;"></span>
+
+    <!-- Lumières -->
+    <span class="lights" style="--size:12px; --left:15%; --duration:8s;"></span>
+    <span class="lights" style="--size:10px; --left:45%; --duration:10s;"></span>
+    <span class="lights" style="--size:14px; --left:70%; --duration:12s;"></span>
+	
+	<!-- Etoiles -->
+	<span class="star" style="--size:18px; --left:15%; --duration:12s;"></span>
+    <span class="star" style="--size:12px; --left:45%; --duration:8s;"></span>
+	<span class="star" style="--size:25px; --left:85%; --duration:10s;"></span>
+	
+	<!-- Lunes -->
+	<span class="lune" style="--size:18px; --left:20%; --duration:10s;"></span>
+    <span class="lune" style="--size:12px; --left:50%; --duration:15s;"></span>
+	<span class="lune" style="--size:25px; --left:90%; --duration:13s;"></span>
+	
+	<div class="shooting-star" style="--size:25px; --duration:5s; --start-left:0vw; --start-bottom:65%;">
+	  <div class="trail"></div>
+	  <div class="star-shape"></div>
+	</div>
+	<div class="shooting-star" style="--size:25px; --duration:6s; --start-left:0vw; --start-bottom:10%;">
+	  <div class="trail"></div>
+	  <div class="star-shape"></div>
+	</div>
+	<div class="shooting-star" style="--size:25px; --duration:7s; --start-left:50vw; --start-bottom:0%;">
+	  <div class="trail"></div>
+	  <div class="star-shape"></div>
+	</div>
+	
+	<div id="cursor-trail"></div>
+</div>
+
+<header>
+    <div class="header-left">
+        <button id="goHomeBtn">Changer de jeu</button>
+		<button id="changeThemeBtn" style="display:none;">Changer de thème</button>
+    </div>
+    <h1>
+        <span class="emoji">✍️</span>
+        <span class="title-text">Ecriture</span>
+    </h1>
+</header>
+
+<main>
+
+<!-- AJOUT MENU -->
+<div id="themeMenu">
+    <div class="theme-card" onclick="choisirMode('lettres')">
+        <span>✏️</span>
+        <p>Lettres</p>
+    </div>
+
+    <div class="theme-card" onclick="choisirMode('mots')">
+        <span>📝</span>
+        <p>Mots</p>
+    </div>
+</div>
+
+<!-- JEU (inchangé) -->
+<div class="game-container" style="display:none;">
+
+    <div class="canvas-wrapper">
+        <h2 id="modele">A</h2>
+        <canvas id="writeCanvas" width="1000" height="400"></canvas>
+    </div>
+
+    <div class="buttons">
+        <button onclick="clearCanvas()">Effacer</button>
+        <button onclick="validate()">Valider</button>
+        <button onclick="nextLetter()">Suivant</button>
+    </div>
+
+    <p id="result"></p>
+
+</div>
+
+</main>
+
+<script>
+
+goHomeBtn.onclick = () => {
+    window.location.href = "../Accueil/Accueil.html";
+};
+
+changeThemeBtn.onclick = () => {
+    document.getElementById("themeMenu").style.display = "block";
+    document.querySelector(".game-container").style.display = "none";
+	themeMenu.style.display = "flex";
+    changeThemeBtn.style.display = "none";
+};
+
+
+/* ===================== */
+/* AJOUT MODE DE JEU */
+/* ===================== */
+
+let mode = null;
+
+function choisirMode(type){
+    mode = type;
+
+    document.getElementById("themeMenu").style.display = "none";
+    document.querySelector(".game-container").style.display = "flex";
+	document.getElementById("changeThemeBtn").style.display = "block";
+
+    initJeu();
+}
+
+/* ===================== */
+/* TES VARIABLES (INCHANGÉES) */
+/* ===================== */
+
+const lettres = [
+  "A","B","C","D","E","F","G","H","I","J","K","L","M",
+  "N","O","P","Q","R","S","T","U","V","W","X","Y","Z",
+
+  "a","b","c","d","e","f","g","h","i","j","k","l","m",
+  "n","o","p","q","r","s","t","u","v","w","x","y","z"
+];
+const mots = [
+  "Chat", "Maison", "Soleil", "Lune", "Chien", "Poisson", "Oiseau",
+  "Arbre", "Fleur", "Voiture", "Avion", "Train", "Bateau",
+  "École", "Livre", "Crayon", "Stylo", "Table", "Chaise",
+  "Pomme", "Banane", "Orange", "Fraise", "Raisin",
+  "Carotte", "Tomate", "Salade",
+  "Ciel", "Nuage", "Pluie", "Neige", "Vent",
+  "Montagne", "Rivière", "Mer", "Plage",
+  "Maison", "Jardin", "Village", "Ville",
+  "Étoile", "Planète", "Espace",
+  "Doigt", "Main", "Pied", "Bras", "Tête",
+  "Robot", "Dinosaure", "Camion", "Moto"
+];
+
+let index = 0;
+
+/* ===================== */
+/* INITIALISATION (AJOUT) */
+/* ===================== */
+
+function initJeu(){
+    index = 0;
+
+    if(mode === "lettres"){
+        lettresMelangees = melanger(lettres);
+        document.getElementById("modele").textContent = lettresMelangees[index];
+    }
+
+    if(mode === "mots"){
+        motsMelanges = melanger(mots);
+        document.getElementById("modele").textContent = motsMelanges[index];
+    }
+}
+
+function melanger(tableau) {
+    return tableau
+        .map(value => ({ value, sort: Math.random() }))
+        .sort((a, b) => a.sort - b.sort)
+        .map(({ value }) => value);
+}
+
+/* ===================== */
+/* TON CANVAS (INCHANGÉ) */
+/* ===================== */
+
+const canvas = document.getElementById("writeCanvas");
+const ctxWrite = canvas.getContext("2d");
+
+let drawing = false;
+
+canvas.addEventListener("mousedown", () => drawing = true);
+
+canvas.addEventListener("mouseup", () => {
+    drawing = false;
+    ctxWrite.beginPath();
+});
+
+canvas.addEventListener("mousemove", draw);
+
+canvas.addEventListener("touchstart", () => drawing = true);
+
+canvas.addEventListener("touchend", () => {
+    drawing = false;
+    ctxWrite.beginPath();
+});
+
+canvas.addEventListener("touchmove", drawTouch);
+
+function draw(e){
+    if(!drawing) return;
+
+    ctxWrite.lineWidth = 8;
+    ctxWrite.lineCap = "round";
+    ctxWrite.strokeStyle = "#333";
+
+    ctxWrite.lineTo(e.offsetX, e.offsetY);
+    ctxWrite.stroke();
+    ctxWrite.beginPath();
+    ctxWrite.moveTo(e.offsetX, e.offsetY);
+}
+
+function drawTouch(e){
+    e.preventDefault();
+
+    const rect = canvas.getBoundingClientRect();
+    const touch = e.touches[0];
+
+    const x = touch.clientX - rect.left;
+    const y = touch.clientY - rect.top;
+
+    ctxWrite.lineWidth = 8;
+    ctxWrite.lineCap = "round";
+    ctxWrite.strokeStyle = "#333";
+
+    ctxWrite.lineTo(x, y);
+    ctxWrite.stroke();
+    ctxWrite.beginPath();
+    ctxWrite.moveTo(x, y);
+}
+
+/* ===================== */
+/* LOGIQUE (ADAPTÉE) */
+/* ===================== */
+
+function clearCanvas(){
+    ctxWrite.clearRect(0,0,canvas.width,canvas.height);
+}
+
+function validate(){
+    document.getElementById("result").textContent = "⭐ Bravo !";
+
+    setTimeout(()=>{
+        nextLetter();
+    },1000);
+}
+
+function nextLetter(){
+
+    if(mode === "lettres"){
+        index++;
+        if(index >= lettresMelangees.length){
+            lettresMelangees = melanger(lettres);
+            index = 0;
+        }
+        document.getElementById("modele").textContent = lettresMelangees[index];
+    }
+
+    if(mode === "mots"){
+        index++;
+        if(index >= motsMelanges.length){
+            motsMelanges = melanger(mots);
+            index = 0;
+        }
+        document.getElementById("modele").textContent = motsMelanges[index];
+    }
+
+    clearCanvas();
+    document.getElementById("result").textContent = "";
+}
+
+// TRAÎNÉE ARC-EN-CIEL FLUIDE LÉGÈRE
+const trailCanvas = document.createElement("canvas");
+trailCanvas.style.position = "fixed";
+trailCanvas.style.top = "0";
+trailCanvas.style.left = "0";
+trailCanvas.style.pointerEvents = "none";
+trailCanvas.style.zIndex = "9999";
+document.body.appendChild(trailCanvas);
+
+const ctx = trailCanvas.getContext("2d");
+let width = window.innerWidth;
+let height = window.innerHeight;
+trailCanvas.width = width;
+trailCanvas.height = height;
+
+window.addEventListener("resize", () => {
+    width = window.innerWidth;
+    height = window.innerHeight;
+    trailCanvas.width = width;
+    trailCanvas.height = height;
+});
+
+let mouseX = width/2;
+let mouseY = height/2;
+let lastMove = Date.now();
+
+document.addEventListener("mousemove", e => {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+    lastMove = Date.now();
+});
+
+const trail = [];
+const maxTrail = 10; // moins de points => traînée plus courte
+
+function animateTrailCanvas() {
+    ctx.clearRect(0,0,width,height);
+
+    // ajoute la nouvelle position
+    trail.push({x: mouseX, y: mouseY, time: Date.now()});
+    if(trail.length > maxTrail) trail.shift();
+
+    for(let i=0; i<trail.length-1; i++){
+        const p = trail[i];
+        const next = trail[i+1];
+        const alpha = 0.8 * (1 - i / trail.length); // plus subtil
+
+        const hue = (i*30 + Date.now()/10)%360;
+        ctx.strokeStyle = `hsla(${hue},100%,60%,${alpha})`;
+        ctx.lineWidth = 6*(alpha); 
+
+        // effet de flou léger
+        ctx.shadowBlur = 8;
+        ctx.shadowColor = ctx.strokeStyle;
+
+        ctx.beginPath();
+        ctx.moveTo(p.x, p.y);
+        ctx.lineTo(next.x, next.y);
+        ctx.stroke();
+    }
+
+    // efface si souris immobile > 300ms
+    if(Date.now() - lastMove > 300){
+        trail.length = 0;
+    }
+
+    requestAnimationFrame(animateTrailCanvas);
+}
+
+animateTrailCanvas();
+
+</script>
+
+</body>
+</html>
