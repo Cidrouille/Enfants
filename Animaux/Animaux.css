@@ -138,7 +138,7 @@ main {
   display: flex;
   justify-content: center;
   align-items: center;
-  background: #fff;
+  background: transparent;
 }
 #animalDisplay img { max-width: 90%; max-height: 90%; }
 
