@@ -20,6 +20,47 @@ a:hover, button:hover {
     cursor: url('images/curseur2.png'), auto;
 }
 
+#touch-controls{
+    position: absolute;
+    left: 200px;
+    top: 45%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    z-index: 1000;
+}
+
+#touch-controls button{
+    width: 70px;
+    height: 70px;
+    font-size: 22px;
+    border-radius: 15px;
+    border: none;
+
+    /* 🌫 verre plus neutre (blanc cassé propre) */
+    background: rgba(245, 245, 245, 0.35);
+
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+
+    /* bordure plus soft */
+    border: 1px solid rgba(255, 255, 255, 0.6);
+
+    /* ombre douce */
+    box-shadow: 0 6px 15px rgba(0,0,0,0.18);
+
+    touch-action: none;
+
+    transition: transform 0.15s ease, background 0.2s ease;
+}
+
+#touch-controls .middle-row{
+    display: flex;
+    gap: 10px;
+}
+
 #goHomeBtn:hover {
     cursor: url('images/curseur2.png'), auto;
 }
@@ -109,9 +150,6 @@ button{
 button:hover{
     transform:scale(1.05);
 }
-
-
-
 
 .background {
     position: fixed;
