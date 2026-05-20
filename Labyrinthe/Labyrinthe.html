@@ -7,6 +7,17 @@
 </head>
 <body>
 
+<!-- CONTRÔLES TACTILES -->
+<div id="touch-controls">
+    <button data-key="ArrowUp">▲</button>
+
+    <div class="middle-row">
+        <button data-key="ArrowLeft">◀</button>
+        <button data-key="ArrowDown">▼</button>
+        <button data-key="ArrowRight">▶</button>
+    </div>
+</div>
+
 <div class="background">
     <!-- Bulles -->
     <span class="bubble" style="--size:30px; --left:10%; --duration:12s;"></span>
@@ -253,6 +264,26 @@ function startNewLevel(){
 /* --- NOUVEAU DÉPLACEMENT FLUIDE --- */
 const keys = {ArrowUp:false, ArrowDown:false, ArrowLeft:false, ArrowRight:false};
 const speed = 300; // pixels par seconde
+
+// --- CONTROLS TACTILES ---
+document.querySelectorAll("#touch-controls button").forEach(btn => {
+    const key = btn.dataset.key;
+
+    const press = () => keys[key] = true;
+    const release = () => keys[key] = false;
+
+    // support souris + tactile
+    btn.addEventListener("mousedown", press);
+    btn.addEventListener("mouseup", release);
+    btn.addEventListener("mouseleave", release);
+
+    btn.addEventListener("touchstart", (e) => {
+        e.preventDefault();
+        press();
+    });
+
+    btn.addEventListener("touchend", release);
+});
 
 document.addEventListener("keydown", e => {
     if(keys.hasOwnProperty(e.key)) keys[e.key] = true;
